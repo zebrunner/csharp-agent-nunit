@@ -4,8 +4,7 @@ using System;
 
 namespace ZafiraIntegration
 {
-    [AttributeUsage( AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Assembly,
-    AllowMultiple = true)]
+    [AttributeUsage( AttributeTargets.Class, AllowMultiple = true)]
     public class ReportTest : ReportSuite,  ITestAction
     {
         

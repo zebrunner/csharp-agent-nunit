@@ -63,7 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiRequest.cs" />
+    <Compile Include="http\ApiRequest.cs" />
     <Compile Include="CIConfig.cs" />
     <Compile Include="models\AbstractType.cs" />
     <Compile Include="models\AuthTokenType.cs" />
@@ -81,8 +81,8 @@
     <Compile Include="models\TestType.cs" />
     <Compile Include="models\UserType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReportTest.cs" />
-    <Compile Include="ReportSuite.cs" />
+    <Compile Include="attributes\ReportTest.cs" />
+    <Compile Include="attributes\ReportSuite.cs" />
     <Compile Include="ZafiraClient.cs" />
     <Compile Include="ZafiraListener.cs" />
   </ItemGroup>

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZafiraIntegration", "ZafiraIntegration.csproj", "{140C6BE2-A67A-4CF9-8817-448FA12B6024}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{140C6BE2-A67A-4CF9-8817-448FA12B6024}.Debug|x64.ActiveCfg = Debug|x64
+		{140C6BE2-A67A-4CF9-8817-448FA12B6024}.Debug|x64.Build.0 = Debug|x64
+		{140C6BE2-A67A-4CF9-8817-448FA12B6024}.Release|x64.ActiveCfg = Release|x64
+		{140C6BE2-A67A-4CF9-8817-448FA12B6024}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {42F4532B-A0D6-483A-B32B-73A3F81F9692}
+	EndGlobalSection
+EndGlobal

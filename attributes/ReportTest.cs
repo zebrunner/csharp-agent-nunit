@@ -9,8 +9,7 @@ namespace ZafiraIntegration
     {
         
         public ReportTest()
-        {
-            
+        {            
         }
 
         public ActionTargets Targets { get; } = ActionTargets.Test;

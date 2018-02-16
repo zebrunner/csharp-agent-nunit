@@ -168,7 +168,7 @@ namespace ZafiraIntegration
 
         private TestType populateTestResult(TestType test)
         {
-            String testName = TestContext.CurrentContext.Test.FullName + "." + TestContext.CurrentContext.Test.MethodName;
+            String testName = TestContext.CurrentContext.Test.ClassName + "." + TestContext.CurrentContext.Test.MethodName;
             test.artifacts.Add(new TestArtifactType("Demo", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Screenshots/" + testName + "/report.html"));
             test.artifacts.Add(new TestArtifactType("Log", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Logs/" + testName + "/test.log"));
             return test;

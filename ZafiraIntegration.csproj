@@ -64,7 +64,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="http\ApiRequest.cs" />
-    <Compile Include="CIConfig.cs" />
+    <Compile Include="config\CIConfig.cs" />
+    <Compile Include="http\Credentials.cs" />
+    <Compile Include="http\FileUpload.cs" />
+    <Compile Include="http\Httpresponse.cs" />
+    <Compile Include="http\ResponseStatus.cs" />
+    <Compile Include="http\User.cs" />
     <Compile Include="models\AbstractType.cs" />
     <Compile Include="models\AuthTokenType.cs" />
     <Compile Include="models\DriverMode.cs" />
@@ -83,8 +88,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="attributes\ReportTest.cs" />
     <Compile Include="attributes\ReportSuite.cs" />
-    <Compile Include="ZafiraClient.cs" />
-    <Compile Include="ZafiraListener.cs" />
+    <Compile Include="client\ZafiraClient.cs" />
+    <Compile Include="listener\ZafiraListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -95,6 +100,7 @@
   <ItemGroup>
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

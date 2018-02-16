@@ -5,88 +5,12 @@ using System.Text;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
+using ZafiraIntegration.http;
 
 namespace ZafiraIntegration
 {
-    public class User
-    {
-        public string username { get; set; }
-        public string password { get; set; }
-    }
-
-    public class Httpresponse
-    {
-        public int Statuscode { get; set; }
-        public string Location { get; set; }
-    }
-    /// <summary>
-    /// Sends credentials for Basic HTTP Authentication
-    /// </summary>
-    public class Credentials
-    {
-        public string UserName { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class ResponseStatus
-    {
-        private string _statusCode;
-        private string _statusMessage;
-        private string _responseBody;
-        private string _header;
-        public ResponseStatus()
-        {
-            _statusCode = "";
-            _statusMessage = "";
-            _responseBody = "";
-            _header = "";
-        }
-        public string Header
-        {
-            get
-            {
-                return _header;
-            }
-            set
-            {
-                _header = value;
-            }
-        }
-        public string StatusCode
-        {
-            get
-            {
-                return _statusCode;
-            }
-            set
-            {
-                _statusCode = value;
-            }
-        }
-        public string StatusMessage
-        {
-            get
-            {
-                return _statusMessage;
-            }
-            set
-            {
-                _statusMessage = value;
-            }
-        }
-        public string ResponseBody
-        {
-            get
-            {
-                return _responseBody;
-            }
-            set
-            {
-                _responseBody = value;
-            }
-        }
-    }
+       
+       
     /// <summary>
     /// Create Http Request, using json, and read Http Response.
     /// </summary>
@@ -146,34 +70,7 @@ namespace ZafiraIntegration
         public ApiRequest()
         {
             Verb = "GET";
-        }
-
-        /// <summary>
-        /// Uploads File via API endpoint
-        /// </summary>
-        public class FileUpload
-        {
-         
-            public async void UploadFile(string url, string filePath)
-            {
-                var httpClient = new HttpClient();
-                var form = new MultipartFormDataContent();
-
-                var fs = File.OpenRead(filePath);
-                var streamContent = new StreamContent(fs);
-
-                var fileContent = new ByteArrayContent(streamContent.ReadAsByteArrayAsync().Result);
-                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
-
-                form.Add(fileContent, "batch", Path.GetFileName(filePath));
-                var response = httpClient.PostAsync(url, form).Result;
-                if (response.StatusCode == HttpStatusCode.Created)
-                {
-                    var responseContent = response.Content.ReadAsStringAsync().Result;
-                    
-                }
-            }
-        }
+        }            
 
 
         public object Execute<TT>(string url, object obj, string verb)
@@ -285,18 +182,16 @@ namespace ZafiraIntegration
         /// <param name="url"></param>
         /// <param name="obj"></param>
         /// <param name="verb"></param>
+        /// <param name="acceptHeader"></param>
         /// <returns></returns>
         public object Execute(string url, object obj, string verb, string acceptHeader)
         {
 
-
             if (url != null)
                 URL = URL + url;
 
-
             if (verb != null)
                 Verb = verb;
-
 
             HttpRequest = CreateRequest(acceptHeader);
 
@@ -324,10 +219,8 @@ namespace ZafiraIntegration
         public object Execute(string url, string urlDataKey, object obj, string verb)
         {
             
-
             if (url != null)
                 URL = URL + urlDataKey;
-            
 
             if (verb != null)
                 Verb = verb;

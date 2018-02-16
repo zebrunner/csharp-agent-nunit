@@ -9,6 +9,7 @@ using ZafiraIntegration.models;
 using NLog;
 using static ZafiraIntegration.ApiRequest;
 using Newtonsoft.Json;
+using ZafiraIntegration.http;
 
 namespace ZafiraIntegration
 {

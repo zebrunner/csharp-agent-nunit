@@ -3,14 +3,12 @@ using System.IO;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using ZafiraIntegration.http;
 
 namespace ZafiraIntegration
 {
-       
-       
+
+
     /// <summary>
     /// Create Http Request, using json, and read Http Response.
     /// </summary>

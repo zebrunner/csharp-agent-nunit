@@ -86,8 +86,8 @@
     <Compile Include="models\TestType.cs" />
     <Compile Include="models\UserType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="attributes\ReportTest.cs" />
-    <Compile Include="attributes\ReportSuite.cs" />
+    <Compile Include="attributes\ZafiraTest.cs" />
+    <Compile Include="attributes\ZafiraSuite.cs" />
     <Compile Include="client\ZafiraClient.cs" />
     <Compile Include="listener\ZafiraListener.cs" />
   </ItemGroup>

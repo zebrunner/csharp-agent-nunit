@@ -5,26 +5,23 @@ using System;
 namespace ZafiraIntegration
 {
     [AttributeUsage( AttributeTargets.Class, AllowMultiple = true)]
-    public class ReportSuite : Attribute, ITestAction
+    public class ZafiraTest : ZafiraSuite,  ITestAction
     {
-        public static ZafiraListener zafiraListener = new ZafiraListener();
-
-        public ReportSuite()
+        
+        public ZafiraTest()
         {            
         }
 
-        public ActionTargets Targets { get; } = ActionTargets.Suite;
+        public ActionTargets Targets { get; } = ActionTargets.Test;
 
         public void BeforeTest(ITest test)
         {
-            zafiraListener.onStart();
+           zafiraListener.onTestStart();
         }
 
         public void AfterTest(ITest test)
-        {           
-            zafiraListener.onFinish();
+        {
+            zafiraListener.onTestFinish();           
         }
-
-       
     }
 }

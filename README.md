@@ -1,4 +1,4 @@
-# ZafiraIntegration with NUnit
+# Zafira::NUnit
 
 ZafiraIntegration library that implements integration Zafira reporting into existing NUnit test structure.
 

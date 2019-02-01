@@ -4,6 +4,7 @@ using NUnit.Framework.Interfaces;
 using System;
 using System.Configuration;
 using System.IO;
+using System.Text;
 using ZafiraIntegration.models;
 
 namespace ZafiraIntegration
@@ -12,59 +13,65 @@ namespace ZafiraIntegration
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static string ANONYMOUS = "anonymous";
-        private static string JIRA_SUITE_ID = getString("jira_suite_id", null);
-        private static bool ZAFIRA_ENABLED = getBoolean("zafira_enabled", true);
-        private static string ZAFIRA_URL = getString("zafira_service_url", "http://demo.qaprosoft.com/zafira-ws");
-        private static string ZAFIRA_ACCESS_TOKEN = getString("zafira_access_token", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicGFzc3dvcmQiOiIySDl5ZVhNcWoxb1lLVm1WZlYxY28vZ3ZYdmRHejdxTiIsImV4cCI6MTMwMzY3NTM4MTk1fQ.yqp4BJd7OpgX7aOdQOjGKdYb2DvHK2ds6ilc0MoO6p_vkbZhkjIK-eCr8dhT7Riwj8x6ru0Lup6Zj-FithCfOw");
-        private static string ZAFIRA_PROJECT = getString("zafira_project", "RomaTest");
-        private static string ZAFIRA_REPORT_EMAILS = getString("zafira_report_emails", "test@gmail.com").Trim().Replace(" ", ",").Replace(";", ",");
-        private static string ZAFIRA_REPORT_FOLDER = getString("zafira_report_folder", "FOLDER_PATH");
-        private static bool ZAFIRA_RERUN_FAILURES = getBoolean("zafira_rerun_failures", false);
-        private static bool ZAFIRA_REPORT_SHOW_STACKTRACE = getBoolean("zafira_report_show_stacktrace", true);
-        private static bool ZAFIRA_REPORT_SHOW_FAILURES_ONLY = getBoolean("zafira_report_failures_only", false);
-        private static string ZAFIRA_CONFIGURATOR = getString("zafira_configurator", "com.qaprosoft.zafira.listener.DefaultConfigurator");
+        private string JIRA_SUITE_ID;
+        private bool ZAFIRA_ENABLED;
+        private string ZAFIRA_URL;
+        private string ZAFIRA_ACCESS_TOKEN;
+        private string ZAFIRA_PROJECT;
+        private string ZAFIRA_REPORT_EMAILS;
+        private string ZAFIRA_REPORT_FOLDER;
+        private bool ZAFIRA_RERUN_FAILURES;
+        private bool ZAFIRA_REPORT_SHOW_STACKTRACE;
+        private bool ZAFIRA_REPORT_SHOW_FAILURES_ONLY;
+        private string ZAFIRA_CONFIGURATOR;
         private CIConfig ci;
         private ZafiraClient zc;
-        private UserType user = null;
-        private JobType parentJob = null;
-        private JobType job = null;
-        private TestSuiteType suite = null;
-        private TestRunType run = null;
-        private TestType test = null;
-        private TestCaseType testCase = null;
+        private UserType user;
+        private JobType parentJob;
+        private JobType job;
+        private TestSuiteType suite;
+        private TestRunType run;
+        [ThreadStatic]
+        private static TestType test;
+        [ThreadStatic]
+        private static TestCaseType testCase;
 
-        [OneTimeSetUp]
-        public void onStart()
+        public void OnStart(AttributeTargets attributeTarget)
         {
-            if (initializeZafira())
+            if (InitializeZafira())
             {
                 user = zc.createUser(new UserType(ci.getCiUserId(), ci.getCiUserEmail(), ci.getCiUserFirstName(),
                         ci.getCiUserLastName()));
-                suite = zc.createTestSuite(new TestSuiteType(TestContext.CurrentContext.Test.FullName, "--", user.id));
-
+                suite = zc.createTestSuite(new TestSuiteType(GetSuiteName(attributeTarget), "--", user.id));
                 parentJob = zc.registerJob(ci.getCiParentUrl(), user.id);
                 job = zc.registerJob(ci.getCiUrl(), user.id);
-                String configXml = "<config><arg unique=\"false\"><key>platform</key><value>" + Environment.GetEnvironmentVariable("platform") + "</value></arg></config>";
+                String configXml = "<config>"
+                    + "<arg unique=\"false\"><key>platform</key><value>" + Environment.GetEnvironmentVariable("platform") + "</value></arg>"
+                    + "<arg unique=\"false\"><key>env</key><value>" + Environment.GetEnvironmentVariable("env") + "</value></arg>"
+                    + "</config>";
                 run = zc.startTestRun(new TestRunType("", suite.id, user.id, "", "", "", configXml, job.id, parentJob.id, ci.getCiBuild(), Initiator.HUMAN.ToString(), ""));
             }
         }
 
-        [SetUp]
-        public void onTestStart()
+        public void OnTestStart()
         {
             if (ZAFIRA_ENABLED)
             {
-                var className = TestContext.CurrentContext.Test.FullName;
+                var fullName = TestContext.CurrentContext.Test.FullName;
+                var className = TestContext.CurrentContext.Test.ClassName;
                 var methodName = TestContext.CurrentContext.Test.MethodName;
+                var testName = className + "." + methodName;
                 var descr = (String)TestContext.CurrentContext.Test.Properties.Get("Description");
-                var testMethodFullName = (descr != null ? descr + " - " : "") + className;
-                testCase = zc.createTestCase(new TestCaseType(className, testMethodFullName, "", suite.id, user.id));
-                test = zc.startTest(populateTestResult(new TestType(testMethodFullName, Status.IN_PROGRESS.ToString(), "", run.id, testCase.id, 0, null, 0, "")));
+                var testMethodFullName = (descr != null ? descr + " - " : "") + fullName;
+                testCase = zc.createTestCase(new TestCaseType(fullName, testMethodFullName, "", suite.id, user.id));
+                test = new TestType(testMethodFullName, Status.IN_PROGRESS.ToString(), "", run.id, testCase.id, DateTimeOffset.Now.ToUnixTimeMilliseconds(), null, 0, "");
+                test.artifacts.Add(new TestArtifactType("Demo", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Screenshots/" + testName + "/report.html"));
+                test.artifacts.Add(new TestArtifactType("Log", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Logs/" + testName + "/test.log"));
+                test = zc.startTest(test);
             }
         }
 
-        [TearDown]
-        public void onTestFinish()
+        public void OnTestFinish()
         {
             if (ZAFIRA_ENABLED)
             {
@@ -76,20 +83,23 @@ namespace ZafiraIntegration
                 {
                     test.status = Status.PASSED.ToString();
                 }
+                else if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Skipped))
+                {
+                    test.status = Status.SKIPPED.ToString();
+                }
                 else
                 {
                     test.status = Status.UNKNOWN.ToString();
                 }
-                var finishedTest = zc.finishTest(test);
-                var finishedTestRun = zc.finishTestRun(run.id);
+                var finishedTest = zc.finishTest(PopulateTestResult(test));
             }
         }
 
-        [OneTimeTearDown]
-        public void onFinish()
+        public void OnFinish()
         {
             if (ZAFIRA_ENABLED)
             {
+                var finishedTestRun = zc.finishTestRun(run.id);
                 var sentReport = zc.sendTestRunReport(run.id, ZAFIRA_REPORT_EMAILS, false, true);
                 var className = TestContext.CurrentContext.Test.FullName;
                 var folder = AppDomain.CurrentDomain.BaseDirectory;
@@ -104,25 +114,37 @@ namespace ZafiraIntegration
             }
         }
 
-        private Boolean initializeZafira()
+        private Boolean InitializeZafira()
         {
             Boolean success = false;
             try
             {
                 ci = new CIConfig();
-                ci.setCiRunId(getString("ci_run_id", Guid.NewGuid().ToString()));
-                ci.setCiUrl(getString("ci_url", "http://localhost:8080/job/unavailable"));
-                ci.setCiBuild(getString("ci_build", null));
-                ci.setCiBuildCause(getString("ci_build_cause", "MANUALTRIGGER"));
-                ci.setCiParentUrl(getString("ci_parent_url", "http://localhost:8080/job/unavailable/parent"));
-                ci.setCiParentBuild(getString("ci_parent_build", null));
-                ci.setCiUserId(getString("ci_user_id", ANONYMOUS));
-                ci.setCiUserFirstName(getString("ci_user_first_name", null));
-                ci.setCiUserLastName(getString("ci_user_last_name", null));
-                ci.setCiUserEmail(getString("ci_user_email", null));
-                ci.setGitBranch(getString("git_branch", null));
-                ci.setGitCommit(getString("git_commit", null));
-                ci.setGitUrl(getString("git_url", null));
+                ci.setCiRunId(GetString("ci_run_id", Guid.NewGuid().ToString()));
+                ci.setCiUrl(GetString("ci_url", "http://localhost:8080/job/unavailable"));
+                ci.setCiBuild(GetString("ci_build", null));
+                ci.setCiBuildCause(GetString("ci_build_cause", "MANUALTRIGGER"));
+                ci.setCiParentUrl(GetString("ci_parent_url", "http://localhost:8080/job/unavailable/parent"));
+                ci.setCiParentBuild(GetString("ci_parent_build", null));
+                ci.setCiUserId(GetString("ci_user_id", ANONYMOUS));
+                ci.setCiUserFirstName(GetString("ci_user_first_name", null));
+                ci.setCiUserLastName(GetString("ci_user_last_name", null));
+                ci.setCiUserEmail(GetString("ci_user_email", null));
+                ci.setGitBranch(GetString("git_branch", null));
+                ci.setGitCommit(GetString("git_commit", null));
+                ci.setGitUrl(GetString("git_url", null));
+
+                JIRA_SUITE_ID = GetString("jira_suite_id", null);
+                ZAFIRA_ENABLED = GetBoolean("zafira_enabled", false);
+                ZAFIRA_URL = GetString("zafira_service_url", "http://demo.qaprosoft.com/zafira-ws");
+                ZAFIRA_ACCESS_TOKEN = GetString("zafira_access_token", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicGFzc3dvcmQiOiIySDl5ZVhNcWoxb1lLVm1WZlYxY28vZ3ZYdmRHejdxTiIsImV4cCI6MTMwMzY3NTM4MTk1fQ.yqp4BJd7OpgX7aOdQOjGKdYb2DvHK2ds6ilc0MoO6p_vkbZhkjIK-eCr8dhT7Riwj8x6ru0Lup6Zj-FithCfOw");
+                ZAFIRA_PROJECT = GetString("zafira_project", "DemoTest");
+                ZAFIRA_REPORT_EMAILS = GetString("zafira_report_emails", "demoqaprosoft@gmail.com").Trim().Replace(" ", ",").Replace(";", ",");
+                ZAFIRA_REPORT_FOLDER = GetString("zafira_report_folder", "FOLDER_PATH");
+                ZAFIRA_RERUN_FAILURES = GetBoolean("zafira_rerun_failures", false);
+                ZAFIRA_REPORT_SHOW_STACKTRACE = GetBoolean("zafira_report_show_stacktrace", true);
+                ZAFIRA_REPORT_SHOW_FAILURES_ONLY = GetBoolean("zafira_report_failures_only", false);
+                ZAFIRA_CONFIGURATOR = GetString("zafira_configurator", "com.qaprosoft.zafira.listener.DefaultConfigurator");
 
                 if (ZAFIRA_ENABLED)
                 {
@@ -154,25 +176,45 @@ namespace ZafiraIntegration
             return success;
         }
 
-        private static String getString(String key, String defaultValue)
+        private static String GetString(String key, String defaultValue)
         {
             String result = Environment.GetEnvironmentVariable(key);
             return (result != null) ? result : defaultValue;
         }
 
-        private static Boolean getBoolean(String key, Boolean defaultValue)
+        private static Boolean GetBoolean(String key, Boolean defaultValue)
         {
             String result = Environment.GetEnvironmentVariable(key);
             return (result != null) ? true : defaultValue;
         }
 
-        private TestType populateTestResult(TestType test)
+
+        private TestType PopulateTestResult(TestType test)
         {
-            String testName = TestContext.CurrentContext.Test.ClassName + "." + TestContext.CurrentContext.Test.MethodName;
-            test.artifacts.Add(new TestArtifactType("Demo", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Screenshots/" + testName + "/report.html"));
-            test.artifacts.Add(new TestArtifactType("Log", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Logs/" + testName + "/test.log"));
+            test.message = GetFullStackTrace();
+            test.finishTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             return test;
         }
 
+        private string GetSuiteName(AttributeTargets attributeTarget)
+        {
+            switch (attributeTarget)
+            {
+                case AttributeTargets.Class:
+                    return TestContext.CurrentContext.Test.FullName;
+                case AttributeTargets.Assembly:
+                    string ciUrl = ci.getCiUrl();
+                    return ciUrl != null ? ciUrl.Substring(ciUrl.LastIndexOf('/') + 1) : "Unknown";
+            }
+            throw new Exception("Unable to resolve zafira test suite name. Please check ZafiraSuite attribute usage.");
+        }
+
+        private string GetFullStackTrace()
+        {
+            StringBuilder myStringBuilder = new StringBuilder();
+            myStringBuilder.AppendLine(TestContext.CurrentContext.Result.Message);
+            myStringBuilder.AppendLine(TestContext.CurrentContext.Result.StackTrace);
+            return myStringBuilder.ToString();
+        }
     }
 }

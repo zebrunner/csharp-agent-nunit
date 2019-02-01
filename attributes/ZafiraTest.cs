@@ -4,24 +4,34 @@ using System;
 
 namespace ZafiraIntegration
 {
-    [AttributeUsage( AttributeTargets.Class, AllowMultiple = true)]
-    public class ZafiraTest : ZafiraSuite,  ITestAction
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public class ZafiraTest : Attribute, ITestAction
     {
-        
-        public ZafiraTest()
-        {            
+        [ThreadStatic]
+        private static ZafiraListener _zafiraListener;
+
+        public static ZafiraListener zafiraListener
+        {
+            get
+            {
+                if (_zafiraListener == null)
+                {
+                    _zafiraListener = new ZafiraListener();
+                }
+                return _zafiraListener;
+            }
         }
 
         public ActionTargets Targets { get; } = ActionTargets.Test;
 
         public void BeforeTest(ITest test)
         {
-           zafiraListener.onTestStart();
+            zafiraListener.OnTestStart();
         }
 
         public void AfterTest(ITest test)
         {
-            zafiraListener.onTestFinish();           
+            zafiraListener.OnTestFinish();
         }
     }
 }

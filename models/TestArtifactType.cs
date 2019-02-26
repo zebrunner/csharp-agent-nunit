@@ -11,7 +11,7 @@ namespace ZafiraIntegration.models
         [DataMember]
         public String link;
         [DataMember]
-        public long testId;
+        public long? testId;
         //[DataMember]
         //public DateTime expiresAt;
 

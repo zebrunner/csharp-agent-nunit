@@ -13,11 +13,11 @@ namespace ZafiraIntegration.models
         [DataMember]
         public String description { get; set; }
         [DataMember]
-        public long userId { get; set; }
+        public long? userId { get; set; }
 
         public TestSuiteType() { }
 
-        public TestSuiteType(String name, String fileName, long userId)
+        public TestSuiteType(String name, String fileName, long? userId)
         {
             this.name = name;
             this.userId = userId;

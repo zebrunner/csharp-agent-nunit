@@ -65,6 +65,7 @@ namespace ZafiraIntegration
                 var testMethodFullName = (descr != null ? descr + " - " : "") + fullName;
                 testCase = zc.createTestCase(new TestCaseType(fullName, testMethodFullName, "", suite.id, user.id));
                 test = new TestType(testMethodFullName, Status.IN_PROGRESS.ToString(), "", run.id, testCase.id, DateTimeOffset.Now.ToUnixTimeMilliseconds(), null, 0, "");
+                test.finishTime = null;
                 test.artifacts.Add(new TestArtifactType("Demo", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Screenshots/" + testName + "/report.html"));
                 test.artifacts.Add(new TestArtifactType("Log", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Logs/" + testName + "/test.log"));
                 test = zc.startTest(test);
@@ -213,7 +214,7 @@ namespace ZafiraIntegration
         {
             StringBuilder myStringBuilder = new StringBuilder();
             myStringBuilder.AppendLine(TestContext.CurrentContext.Result.Message);
-            myStringBuilder.AppendLine(TestContext.CurrentContext.Result.StackTrace);
+            myStringBuilder.AppendLine("Stacktrace: " + TestContext.CurrentContext.Result.StackTrace);
             return myStringBuilder.ToString();
         }
     }

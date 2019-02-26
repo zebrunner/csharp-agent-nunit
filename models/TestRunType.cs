@@ -9,7 +9,7 @@ namespace ZafiraIntegration.models
         [DataMember]
         public String ciRunId { get; set; }
         [DataMember]
-        public long testSuiteId { get; set; }
+        public long? testSuiteId { get; set; }
         //[DataMember]
         //public Status status { get; set; }
         [DataMember]
@@ -21,17 +21,17 @@ namespace ZafiraIntegration.models
         [DataMember]
         public String configXML { get; set; }
         [DataMember]
-        public long jobId { get; set; }
+        public long? jobId { get; set; }
         [DataMember]
-        public long upstreamJobId { get; set; }
+        public long? upstreamJobId { get; set; }
         [DataMember]
-        public int upstreamJobBuildNumber { get; set; }
+        public int? upstreamJobBuildNumber { get; set; }
         [DataMember]
-        public int buildNumber { get; set; }
+        public int? buildNumber { get; set; }
         [DataMember]
         public String startedBy;
         [DataMember]
-        public long userId { get; set; }
+        public long? userId { get; set; }
         [DataMember]
         public String workItem { get; set; }
         [DataMember]
@@ -47,8 +47,8 @@ namespace ZafiraIntegration.models
 
         public TestRunType() { }
 
-        public TestRunType(String ciRunId, long testSuiteId, long userId, String scmURL, String scmBranch, String scmCommit,
-            String configXML, long jobId, long upstreamJobId, int buildNumber, String startedBy, String workItem)
+        public TestRunType(String ciRunId, long? testSuiteId, long? userId, String scmURL, String scmBranch, String scmCommit,
+            String configXML, long? jobId, long? upstreamJobId, int? buildNumber, String startedBy, String workItem)
         {
             this.ciRunId = ciRunId;
             this.testSuiteId = testSuiteId;

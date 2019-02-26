@@ -16,11 +16,11 @@ namespace ZafiraIntegration.models
         public String jenkinsHost { get; set; }
 
         [DataMember]
-        public long userId { get; set; }
+        public long? userId { get; set; }
 
         public JobType() { }
 
-        public JobType(String name, String jobURL, String jenkinsHost, long userId)
+        public JobType(String name, String jobURL, String jenkinsHost, long? userId)
         {
             this.name = name;
             this.jobURL = jobURL;

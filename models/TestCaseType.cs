@@ -13,17 +13,17 @@ namespace ZafiraIntegration.models
         [DataMember]
         public String info;
         [DataMember]
-        public long testSuiteId;
+        public long? testSuiteId;
         [DataMember]
-        public long primaryOwnerId;
+        public long? primaryOwnerId;
         [DataMember]
-        public long secondaryOwnerId;
+        public long? secondaryOwnerId;
         [DataMember]
         public ProjectType project;
 
         public TestCaseType() { }
 
-        public TestCaseType(String testClass, String testMethod, String info, long testSuiteId, long primaryOwnerId)
+        public TestCaseType(String testClass, String testMethod, String info, long? testSuiteId, long? primaryOwnerId)
         {
             this.testClass = testClass;
             this.testMethod = testMethod;

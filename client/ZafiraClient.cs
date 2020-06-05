@@ -18,7 +18,7 @@ namespace ZafiraIntegration
         private static Logger LOGGER = LogManager.GetCurrentClassLogger();
         private static string STATUS_PATH = "/api/status";
         private static string REFRESH_TOKEN_PATH = "/api/auth/refresh";
-        private static string USERS_PATH = "/api/users";
+        private static string USERS_PATH = "/api/users/profile?username={0}";
         private static string JOBS_PATH = "/api/jobs";
         private static string TESTS_PATH = "/api/tests";
         private static string TEST_FINISH_PATH = "/api/tests/{0}/finish";
@@ -193,22 +193,24 @@ namespace ZafiraIntegration
             return response;
         }
 
-        public UserType createUser(UserType user)
+
+        public UserType getUser(String userId)
         {
             var response = new UserType();
             try
             {
-                var putUser = Client().Execute(USERS_PATH, user, Method.PUT.ToString());
-                var status = ((ResponseStatus)putUser).StatusCode;
+                var url = String.Format(USERS_PATH, userId);
+                var getUser = Client().Execute(url);
+                var status = ((ResponseStatus)getUser).StatusCode;
 
                 if (status.Equals("200") || status.Equals("OK"))
                 {
-                    response = JsonConvert.DeserializeObject<UserType>(((ResponseStatus)putUser).ResponseBody);
+                    response = JsonConvert.DeserializeObject<UserType>(((ResponseStatus)getUser).ResponseBody);
                 }
             }
             catch (Exception e)
             {
-                LOGGER.Error("Unable to create user " + e);
+                LOGGER.Error("Unable to get user " + e);
             }
             return response;
         }

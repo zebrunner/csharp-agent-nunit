@@ -36,27 +36,19 @@ namespace ZafiraIntegration
         [ThreadStatic]
         private static TestCaseType testCase;
 
+        private bool isInitialized = false;
+
         public void OnStart(AttributeTargets attributeTarget)
         {
-            if (InitializeZafira())
-            {
-                user = zc.createUser(new UserType(ci.getCiUserId(), ci.getCiUserEmail(), ci.getCiUserFirstName(),
-                        ci.getCiUserLastName()));
-                suite = zc.createTestSuite(new TestSuiteType(GetSuiteName(attributeTarget), "--", user.id));
-                parentJob = zc.registerJob(ci.getCiParentUrl(), user.id);
-                job = zc.registerJob(ci.getCiUrl(), user.id);
-                String configXml = "<config>"
-                    + "<arg unique=\"false\"><key>platform</key><value>" + Environment.GetEnvironmentVariable("platform") + "</value></arg>"
-                    + "<arg unique=\"false\"><key>env</key><value>" + Environment.GetEnvironmentVariable("env") + "</value></arg>"
-                    + "</config>";
-                run = zc.startTestRun(new TestRunType("", suite.id, user.id, "", "", "", configXml, job.id, parentJob.id, ci.getCiBuild(), Initiator.HUMAN.ToString(), ""));
-            }
+            InitZafira(attributeTarget);
         }
 
         public void OnTestStart()
         {
-            if (ZAFIRA_ENABLED)
+            logger.Info("Zafira is Attempting to Register a New Tests...");
+            if (isInitialized)
             {
+                logger.Info("Zafira is Enabled has been found...");
                 var fullName = TestContext.CurrentContext.Test.FullName;
                 var className = TestContext.CurrentContext.Test.ClassName;
                 var methodName = TestContext.CurrentContext.Test.MethodName;
@@ -69,12 +61,14 @@ namespace ZafiraIntegration
                 test.artifacts.Add(new TestArtifactType("Demo", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Screenshots/" + testName + "/report.html"));
                 test.artifacts.Add(new TestArtifactType("Log", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Logs/" + testName + "/test.log"));
                 test = zc.startTest(test);
+            } else {
+                logger.Info("Zafira is NOT Enabled correctly..");
             }
         }
 
         public void OnTestFinish()
         {
-            if (ZAFIRA_ENABLED)
+            if (isInitialized)
             {
                 if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Failed))
                 {
@@ -98,7 +92,7 @@ namespace ZafiraIntegration
 
         public void OnFinish()
         {
-            if (ZAFIRA_ENABLED)
+            if (isInitialized)
             {
                 var finishedTestRun = zc.finishTestRun(run.id);
                 var sentReport = zc.sendTestRunReport(run.id, ZAFIRA_REPORT_EMAILS, false, true);
@@ -115,9 +109,18 @@ namespace ZafiraIntegration
             }
         }
 
-        private Boolean InitializeZafira()
+        private void InitZafira(AttributeTargets attributeTarget)
         {
-            Boolean success = false;
+            if (!isInitialized)
+            {
+                logger.Info("Attempting to start up Zafira Listener...");
+            } else
+            {
+                logger.Info("Zafira already initialized");
+                return;
+            }
+            
+
             try
             {
                 ci = new CIConfig();
@@ -149,12 +152,14 @@ namespace ZafiraIntegration
 
                 if (ZAFIRA_ENABLED)
                 {
+                    logger.Info("Zafira is Enabled (1)");
                     zc = new ZafiraClient(ZAFIRA_URL, ZAFIRA_ACCESS_TOKEN, ZAFIRA_PROJECT);
 
                     ZAFIRA_ENABLED = zc.isAvailable();
 
                     if (ZAFIRA_ENABLED)
                     {
+                        logger.Info("Zafira is Enabled (2)");
                         var auth = zc.refreshToken(ZAFIRA_ACCESS_TOKEN);
                         if (auth != null)
                         {
@@ -168,13 +173,29 @@ namespace ZafiraIntegration
 
                     logger.Info("Zafira is " + (ZAFIRA_ENABLED ? "available" : "unavailable"));
                 }
-                success = ZAFIRA_ENABLED;
+                isInitialized = ZAFIRA_ENABLED;
             }
-            catch (ConfigurationException e)
+            catch (Exception e)
             {
                 logger.Error("Unable to locate init ZafiraClient ", e);
             }
-            return success;
+
+            if (isInitialized)
+            {
+                user = zc.getUser(ci.getCiUserId());
+                suite = zc.createTestSuite(new TestSuiteType(GetSuiteName(attributeTarget), "--", user.id));
+                parentJob = zc.registerJob(ci.getCiParentUrl(), user.id);
+                job = zc.registerJob(ci.getCiUrl(), user.id);
+                String configXml = "<config>"
+                    + "<arg unique=\"false\"><key>platform</key><value>" + Environment.GetEnvironmentVariable("platform") + "</value></arg>"
+                    + "<arg unique=\"false\"><key>env</key><value>" + Environment.GetEnvironmentVariable("env") + "</value></arg>"
+                    + "</config>";
+                run = zc.startTestRun(new TestRunType("", suite.id, user.id, "", "", "", configXml, job.id, parentJob.id, ci.getCiBuild(), Initiator.HUMAN.ToString(), ""));
+            } else
+            {
+                logger.Info("Failed to Initialize Zafira");
+            }
+            return;
         }
 
         private static String GetString(String key, String defaultValue)
@@ -186,6 +207,7 @@ namespace ZafiraIntegration
         private static Boolean GetBoolean(String key, Boolean defaultValue)
         {
             String result = Environment.GetEnvironmentVariable(key);
+            logger.Info("Key (" + key + ") Value: " + result);
             return (result != null) ? true : defaultValue;
         }
 

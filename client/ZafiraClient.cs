@@ -18,7 +18,7 @@ namespace ZafiraIntegration
         private static Logger LOGGER = LogManager.GetCurrentClassLogger();
         private static string STATUS_PATH = "/api/status";
         private static string REFRESH_TOKEN_PATH = "/api/auth/refresh";
-        private static string USERS_PATH = "/api/users";
+        private static string USERS_PATH = "/api/users/profile?username={0}";
         private static string JOBS_PATH = "/api/jobs";
         private static string TESTS_PATH = "/api/tests";
         private static string TEST_FINISH_PATH = "/api/tests/{0}/finish";
@@ -56,10 +56,11 @@ namespace ZafiraIntegration
             var response = new AuthTokenType();
             try
             {
+                LOGGER.Info("Refresh Token Before Refresh: " + token);
                 var postRefreshToken = Client().Execute(REFRESH_TOKEN_PATH, new RefreshTokenType(token), Method.POST.ToString());
                 var status = ((ResponseStatus)postRefreshToken).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<AuthTokenType>(((ResponseStatus)postRefreshToken).ResponseBody);
                 }
@@ -76,10 +77,13 @@ namespace ZafiraIntegration
             var isAvailable = false;
             try
             {
+                LOGGER.Info("Is Available Path: " + STATUS_PATH);
                 var response = Client().Execute(STATUS_PATH);
+                LOGGER.Info("Attempting to get Response Status..");
                 var status = ((ResponseStatus)response).StatusCode;
+                LOGGER.Info("Response Status of is Available: " + status);
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     isAvailable = true;
                 }
@@ -87,6 +91,7 @@ namespace ZafiraIntegration
             catch (Exception e)
             {
                 LOGGER.Error(e, "Unable to send ping");
+                LOGGER.Error("Error Message: " + e.StackTrace.ToString());
             }
             return isAvailable;
         }
@@ -105,7 +110,7 @@ namespace ZafiraIntegration
             }
 
             var jobDetails = "jobName: {0}, jenkinsHost: {1}, userId: {2}";
-            LOGGER.Debug("Job details for registration:" + String.Format(jobDetails, jobName, jenkinsHost, userId));
+            LOGGER.Info("Job details for registration:" + String.Format(jobDetails, jobName, jenkinsHost, userId));
 
             var job = new JobType(jobName, jobUrl, jenkinsHost, userId);
 
@@ -117,7 +122,7 @@ namespace ZafiraIntegration
             }
             else
             {
-                LOGGER.Debug("Registered job details:" + String.Format(jobDetails, job.name, job.jenkinsHost, job.userId));
+                LOGGER.Info("Registered job details:" + String.Format(jobDetails, job.name, job.jenkinsHost, job.userId));
             }
 
             return job;
@@ -132,7 +137,7 @@ namespace ZafiraIntegration
                 var postJob = Client().Execute(JOBS_PATH, job, Method.POST.ToString());
                 var status = ((ResponseStatus)postJob).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<JobType>(((ResponseStatus)postJob).ResponseBody);
                 }
@@ -154,7 +159,7 @@ namespace ZafiraIntegration
                 var postTestCase = Client().Execute(TEST_CASES_PATH, testCase, Method.POST.ToString());
                 var status = ((ResponseStatus)postTestCase).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<TestCaseType>(((ResponseStatus)postTestCase).ResponseBody);
                 }
@@ -176,7 +181,7 @@ namespace ZafiraIntegration
                 var postTestSuite = Client().Execute(TEST_SUITES_PATH, testSuite, Method.POST.ToString());
                 var status = ((ResponseStatus)postTestSuite).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<TestSuiteType>(((ResponseStatus)postTestSuite).ResponseBody);
                 }
@@ -188,22 +193,24 @@ namespace ZafiraIntegration
             return response;
         }
 
-        public UserType createUser(UserType user)
+
+        public UserType getUser(String userId)
         {
             var response = new UserType();
             try
             {
-                var putUser = Client().Execute(USERS_PATH, user, Method.PUT.ToString());
-                var status = ((ResponseStatus)putUser).StatusCode;
+                var url = String.Format(USERS_PATH, userId);
+                var getUser = Client().Execute(url);
+                var status = ((ResponseStatus)getUser).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
-                    response = JsonConvert.DeserializeObject<UserType>(((ResponseStatus)putUser).ResponseBody);
+                    response = JsonConvert.DeserializeObject<UserType>(((ResponseStatus)getUser).ResponseBody);
                 }
             }
             catch (Exception e)
             {
-                LOGGER.Error("Unable to create user " + e);
+                LOGGER.Error("Unable to get user " + e);
             }
             return response;
         }
@@ -216,7 +223,7 @@ namespace ZafiraIntegration
             {
                 var postRunFinished = Client().Execute(String.Format(TEST_RUNS_FINISH_PATH, id), "", Method.POST.ToString());
                 var status = ((ResponseStatus)postRunFinished).StatusCode;
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<TestRunType>(((ResponseStatus)postRunFinished).ResponseBody);
                 }
@@ -237,7 +244,7 @@ namespace ZafiraIntegration
                 var postTestRun = Client().Execute(TEST_RUNS_PATH, testRun, Method.POST.ToString());
                 var status = ((ResponseStatus)postTestRun).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<TestRunType>(((ResponseStatus)postTestRun).ResponseBody);
                 }
@@ -261,7 +268,7 @@ namespace ZafiraIntegration
                 var postTestRun = Client().Execute(url, new EmailType(recipients), Method.POST.ToString(), "text/html");
                 var status = ((ResponseStatus)postTestRun).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = ((ResponseStatus)postTestRun).ResponseBody;
                 }
@@ -282,7 +289,7 @@ namespace ZafiraIntegration
                 var postFinishTest = Client().Execute(String.Format(TEST_FINISH_PATH, test.id), test, Method.POST.ToString());
                 var status = ((ResponseStatus)postFinishTest).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<TestType>(((ResponseStatus)postFinishTest).ResponseBody);
                 }
@@ -303,7 +310,7 @@ namespace ZafiraIntegration
                 var postTest = Client().Execute(TESTS_PATH, test, Method.POST.ToString());
                 var status = ((ResponseStatus)postTest).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<TestType>(((ResponseStatus)postTest).ResponseBody);
                 }
@@ -324,7 +331,7 @@ namespace ZafiraIntegration
                 var postTestRunType = Client().Execute(TEST_RUNS_PATH, testRun, Method.POST.ToString());
                 var status = ((ResponseStatus)postTestRunType).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<TestRunType>(((ResponseStatus)postTestRunType).ResponseBody);
                 }
@@ -346,7 +353,7 @@ namespace ZafiraIntegration
                 var postTestType = Client().Execute(String.Format(TEST_WORK_ITEMS_PATH, testId), workItems, Method.POST.ToString());
                 var status = ((ResponseStatus)postTestType).StatusCode;
 
-                if (status.Equals("200"))
+                if (status.Equals("200") || status.Equals("OK"))
                 {
                     response = JsonConvert.DeserializeObject<TestType>(((ResponseStatus)postTestType).ResponseBody);
                 }

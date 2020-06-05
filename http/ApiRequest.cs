@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 using ZafiraIntegration.http;
+using NLog;
 
 namespace ZafiraIntegration
 {
@@ -14,7 +15,8 @@ namespace ZafiraIntegration
     /// </summary>
     public class ApiRequest
     {
-         /// <summary>
+        private static Logger LOGGER = LogManager.GetCurrentClassLogger();
+        /// <summary>
         /// Url of http server wich request will be created to.
         /// </summary>
         public String URL { get; set; }
@@ -83,6 +85,7 @@ namespace ZafiraIntegration
                 Verb = verb;
            
             HttpRequest = CreateRequest();
+            LOGGER.Info("Request (1): " + HttpRequest.ToString());
 
             WriteStream(obj);
 
@@ -94,6 +97,7 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
+                LOGGER.Info("Error (1): " + error.Message);
                 return ReadResponseFromError(error);
             }
             return JsonConvert.DeserializeObject<TT>(ReadResponse().ResponseBody);
@@ -102,10 +106,11 @@ namespace ZafiraIntegration
         public object Execute<TT>(string url)
         {
             if (url != null)
-                URL = url;
+                URL = URL + url;
             
 
             HttpRequest = CreateRequest();
+            LOGGER.Info("Request (2): " + HttpRequest.ToString());
 
             try
             {
@@ -114,6 +119,7 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
+                LOGGER.Info("Error (2): " + error.Message);
                 return ReadResponseFromError(error);
             }
             return JsonConvert.DeserializeObject<TT>(ReadResponse().ResponseBody);
@@ -126,6 +132,7 @@ namespace ZafiraIntegration
             
 
             HttpRequest = CreateRequest();
+            LOGGER.Info("Request (3): " + HttpRequest.ToString());
 
             try
             {
@@ -134,6 +141,7 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
+                LOGGER.Info("Error (3): " + error.Message);
                 return ReadResponseFromError(error);
             }
             return JsonConvert.DeserializeObject<TT>(ReadResponse().ResponseBody);
@@ -159,12 +167,16 @@ namespace ZafiraIntegration
             
 
             HttpRequest = CreateRequest();
+            LOGGER.Info("Request URL: " + URL);
+            LOGGER.Info("Request Headers: " + HttpRequest.Headers.ToString());
+            LOGGER.Info("Request Method: " + HttpRequest.Method);
 
             WriteStream(obj);
 
             try
             {
                 HttpResponse = (HttpWebResponse)HttpRequest.GetResponse();
+
             }
             catch (WebException error)
             {
@@ -192,6 +204,7 @@ namespace ZafiraIntegration
                 Verb = verb;
 
             HttpRequest = CreateRequest(acceptHeader);
+            LOGGER.Info("Request (4): " + HttpRequest.ToString());
 
             WriteStream(obj);
 
@@ -202,6 +215,7 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
+                LOGGER.Info("Error (4): " + error.Message);
                 return ReadResponseFromError(error);
             }
             return ReadResponse();
@@ -225,6 +239,7 @@ namespace ZafiraIntegration
             
 
             HttpRequest = CreateRequest();
+            LOGGER.Info("Request (5): " + HttpRequest.ToString());
             WriteStream(obj);
             try
             {
@@ -233,6 +248,7 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
+                LOGGER.Info("Error (5): " + error.Message);
                 return ReadResponseFromError(error);
             }
             return ReadResponse();
@@ -250,14 +266,21 @@ namespace ZafiraIntegration
             
 
             HttpRequest = CreateRequest(); ;
+            LOGGER.Info("Request (6): " + HttpRequest.RequestUri.OriginalString);
             try
             {
                 HttpResponse = (HttpWebResponse)HttpRequest.GetResponse();
+                LOGGER.Info("Response Code is: " + HttpResponse.StatusCode);
             }
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
+                LOGGER.Info("Error (6): " + error.Message);
                 return ReadResponseFromError(error);
+            }
+            catch (Exception e)
+            {
+                LOGGER.Info("Error Seen on API Call: " + e.Message);
             }
             return ReadResponse();
         }
@@ -272,6 +295,7 @@ namespace ZafiraIntegration
             
 
             HttpRequest = CreateRequest();
+            LOGGER.Info("Request (7): " + HttpRequest.ToString());
 
             try
             {
@@ -280,6 +304,7 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
+                LOGGER.Info("Error (7): " + error.Message);
                 return ReadResponseFromError(error);
             }
             return ReadResponse();
@@ -357,9 +382,15 @@ namespace ZafiraIntegration
                 using (var streamWriter = new StreamWriter(HttpRequest.GetRequestStream()))
                 {
                     if (obj is string)
+                    {
                         streamWriter.Write(obj);
+                        LOGGER.Info("WriteStream (String): " + obj);
+                    }
                     else
+                    {
                         streamWriter.Write(JsonConvert.SerializeObject(obj));
+                        LOGGER.Info("WriteStream (JSON): " + JsonConvert.SerializeObject(obj));
+                    }
                 }
             }
         }
@@ -384,13 +415,14 @@ namespace ZafiraIntegration
                         }
                         catch (Exception e)
                         {
-                            
+                            LOGGER.Info("Response Exception: " + e.Message);
                         }
                     }
                     status.StatusCode = ((int)HttpResponse.StatusCode).ToString();
                     status.StatusMessage = HttpResponse.StatusDescription.ToString();
                     status.ResponseBody = streamReader.ReadToEnd();
-                    
+                    LOGGER.Info("Status Code: " + status.StatusCode);
+                    LOGGER.Info("Status ResponseBody: " + status.ResponseBody);
                 }
             return status;
         }
@@ -418,10 +450,13 @@ namespace ZafiraIntegration
 
             status.StatusCode = ((int)HttpResponse.StatusCode).ToString();
             status.StatusMessage = HttpResponse.StatusDescription.ToString();
+            LOGGER.Info("Error Status Code: " + status.StatusCode);
+            LOGGER.Info("Error Status Message: " + status.StatusMessage);
            
-
             using (var streamReader = new StreamReader(error.Response.GetResponseStream()))
                 status.ResponseBody = streamReader.ReadToEnd();
+
+            LOGGER.Info("Error Status Body: " + status.ResponseBody);
 
             return status;
         }

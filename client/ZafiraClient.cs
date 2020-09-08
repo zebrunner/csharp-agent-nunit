@@ -16,18 +16,18 @@ namespace ZafiraIntegration
     public class ZafiraClient
     {
         private static Logger LOGGER = LogManager.GetCurrentClassLogger();
-        private static string STATUS_PATH = "/api/status";
-        private static string REFRESH_TOKEN_PATH = "/api/auth/refresh";
-        private static string USERS_PATH = "/api/users/profile?username={0}";
-        private static string JOBS_PATH = "/api/jobs";
-        private static string TESTS_PATH = "/api/tests";
-        private static string TEST_FINISH_PATH = "/api/tests/{0}/finish";
-        private static string TEST_WORK_ITEMS_PATH = "/api/tests/{0}/workitems";
-        private static string TEST_SUITES_PATH = "/api/tests/suites";
-        private static string TEST_CASES_PATH = "/api/tests/cases";
-        private static string TEST_RUNS_PATH = "/api/tests/runs";
-        private static string TEST_RUNS_FINISH_PATH = "/api/tests/runs/{0}/finish";
-        private static string TEST_RUN_EMAIL_PATH = "/api/tests/runs/{0}/email?filter={1}&showStacktrace={2}";
+        private static string STATUS_PATH = "/api/reporting/api/status";
+        private static string REFRESH_TOKEN_PATH = "/api/iam/v1/auth/refresh";
+        private static string USERS_PATH = "/api/iam/v1/users/{0}";
+        private static string JOBS_PATH = "/api/reporting/api/jobs";
+        private static string TESTS_PATH = "/api/reporting/api/tests";
+        private static string TEST_FINISH_PATH = "/api/reporting/api/tests/{0}/finish";
+        private static string TEST_WORK_ITEMS_PATH = "/api/reporting/api/tests/{0}/workitems";
+        private static string TEST_SUITES_PATH = "/api/reporting/api/tests/suites";
+        private static string TEST_CASES_PATH = "/api/reporting/api/tests/cases";
+        private static string TEST_RUNS_PATH = "/api/reporting/api/tests/runs";
+        private static string TEST_RUNS_FINISH_PATH = "/api/reporting/api/tests/runs/{0}/finish";
+        private static string TEST_RUN_EMAIL_PATH = "/api/reporting/api/tests/runs/{0}/email?filter={1}&showStacktrace={2}";
         public string ServiceURL { get; set; }
         public string AuthToken { get; set; }
         public string Project { get; set; }

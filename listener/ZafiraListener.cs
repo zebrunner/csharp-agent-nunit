@@ -163,7 +163,7 @@ namespace ZafiraIntegration
                         var auth = zc.refreshToken(ZAFIRA_ACCESS_TOKEN);
                         if (auth != null)
                         {
-                            zc.AuthToken = auth.type + " " + auth.accessToken;
+                            zc.AuthToken = auth.type + " " + auth.authToken;
                         }
                         else
                         {

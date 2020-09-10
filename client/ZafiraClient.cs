@@ -18,7 +18,7 @@ namespace ZafiraIntegration
         private static Logger LOGGER = LogManager.GetCurrentClassLogger();
         private static string STATUS_PATH = "/api/reporting/api/status";
         private static string REFRESH_TOKEN_PATH = "/api/iam/v1/auth/refresh";
-        private static string USERS_PATH = "/api/iam/v1/users/{0}";
+        private static string USERS_PATH = "/api/iam/v1/users?username={0}";
         private static string JOBS_PATH = "/api/reporting/api/jobs";
         private static string TESTS_PATH = "/api/reporting/api/tests";
         private static string TEST_FINISH_PATH = "/api/reporting/api/tests/{0}/finish";

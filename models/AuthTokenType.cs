@@ -9,7 +9,7 @@ namespace ZafiraIntegration.models
         [DataMember]
         public String type { get; set; }
         [DataMember]
-        public String accessToken { get; set; }
+        public String authToken { get; set; }
         [DataMember]
         public String refreshToken { get; set; }
         [DataMember]

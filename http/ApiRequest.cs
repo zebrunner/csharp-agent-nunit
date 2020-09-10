@@ -266,7 +266,8 @@ namespace ZafiraIntegration
             
 
             HttpRequest = CreateRequest(); ;
-            LOGGER.Info("Request (6): " + HttpRequest.RequestUri.OriginalString);
+            LOGGER.Info("Request (6) Uri is: " + HttpRequest.RequestUri.OriginalString);
+            LOGGER.Info("Request (6) Headers are: " + HttpRequest.Headers);
             try
             {
                 HttpResponse = (HttpWebResponse)HttpRequest.GetResponse();

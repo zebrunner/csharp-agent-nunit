@@ -1,5 +1,6 @@
 ﻿using NLog;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using System;
 using System.Configuration;
 using System.IO;
@@ -14,16 +15,10 @@ namespace ZafiraIntegration
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static string ANONYMOUS = "anonymous";
-        private string JIRA_SUITE_ID;
         private string ZAFIRA_URL;
         private string ZAFIRA_ACCESS_TOKEN;
         private string ZAFIRA_PROJECT;
         private string ZAFIRA_REPORT_EMAILS;
-        private string ZAFIRA_REPORT_FOLDER;
-        private bool ZAFIRA_RERUN_FAILURES;
-        private bool ZAFIRA_REPORT_SHOW_STACKTRACE;
-        private bool ZAFIRA_REPORT_SHOW_FAILURES_ONLY;
-        private string ZAFIRA_CONFIGURATOR;
         private CIConfig ci;
         private ZafiraClient zc;
         private UserType user;
@@ -36,7 +31,7 @@ namespace ZafiraIntegration
         [ThreadStatic]
         private static TestCaseType testCase;
 
-        private bool isEnabled;
+        private bool isEnabled = false;
         private bool isAvailable = false;
         private bool isInitialized = false;
 
@@ -113,21 +108,24 @@ namespace ZafiraIntegration
 
         private void InitZafira(AttributeTargets attributeTarget)
         {
-            if (!isInitialized)
+            isEnabled = GetBoolean("isEnabled", false);
+            if (!isEnabled)
             {
-                logger.Info("Attempting to start up Zafira Listener...");
-            } else
+                logger.Info("Zafira is not enabled");
+                return;
+            }
+
+            if (isInitialized)
             {
                 logger.Info("Zafira already initialized");
                 return;
             }
-            
+
+            logger.Info("Attempting to init Zafira Client...");
 
             try
             {
                 ci = new CIConfig();
-                isEnabled = GetBoolean("isEnabled", false);
-
                 ci.setCiRunId(GetString("ci_run_id", Guid.NewGuid().ToString()));
                 ci.setCiUrl(GetString("ci_url", "http://localhost:8080/job/unavailable"));
                 ci.setCiBuild(GetString("ci_build", null));
@@ -142,16 +140,10 @@ namespace ZafiraIntegration
                 ci.setGitCommit(GetString("git_commit", null));
                 ci.setGitUrl(GetString("git_url", null));
 
-                JIRA_SUITE_ID = GetString("jira_suite_id", null);
-                ZAFIRA_URL = GetString("zafira_service_url", "http://demo.qaprosoft.com/zafira-ws");
-                ZAFIRA_ACCESS_TOKEN = GetString("zafira_access_token", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicGFzc3dvcmQiOiIySDl5ZVhNcWoxb1lLVm1WZlYxY28vZ3ZYdmRHejdxTiIsImV4cCI6MTMwMzY3NTM4MTk1fQ.yqp4BJd7OpgX7aOdQOjGKdYb2DvHK2ds6ilc0MoO6p_vkbZhkjIK-eCr8dhT7Riwj8x6ru0Lup6Zj-FithCfOw");
-                ZAFIRA_PROJECT = GetString("zafira_project", "DemoTest");
-                ZAFIRA_REPORT_EMAILS = GetString("zafira_report_emails", "demoqaprosoft@gmail.com").Trim().Replace(" ", ",").Replace(";", ",");
-                ZAFIRA_REPORT_FOLDER = GetString("zafira_report_folder", "FOLDER_PATH");
-                ZAFIRA_RERUN_FAILURES = GetBoolean("zafira_rerun_failures", false);
-                ZAFIRA_REPORT_SHOW_STACKTRACE = GetBoolean("zafira_report_show_stacktrace", true);
-                ZAFIRA_REPORT_SHOW_FAILURES_ONLY = GetBoolean("zafira_report_failures_only", false);
-                ZAFIRA_CONFIGURATOR = GetString("zafira_configurator", "com.qaprosoft.zafira.listener.DefaultConfigurator");
+                ZAFIRA_URL = GetString("zafira_service_url", "http://demo.qaprosoft.com");
+                ZAFIRA_ACCESS_TOKEN = GetString("zafira_access_token", "");
+                ZAFIRA_PROJECT = GetString("zafira_project", "UNKNOWN");
+                ZAFIRA_REPORT_EMAILS = GetString("zafira_report_emails", "").Trim().Replace(" ", ",").Replace(";", ",");
 
                 if (isEnabled)
                 {

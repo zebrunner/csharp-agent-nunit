@@ -32,10 +32,9 @@ namespace ZafiraIntegration
         public string AuthToken { get; set; }
         public string Project { get; set; }
 
-        public ZafiraClient(string url, string authToken, string project)
+        public ZafiraClient(string url, string project)
         {
             ServiceURL = url;
-            AuthToken = authToken;
             Project = project;
         }
 
@@ -44,7 +43,7 @@ namespace ZafiraIntegration
             return new ApiRequest
             {
                 URL = ServiceURL,
-                AccessToken = AuthToken,
+                AuthToken = AuthToken,
                 Project = Project
             };
         }

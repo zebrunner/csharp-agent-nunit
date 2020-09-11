@@ -22,13 +22,12 @@ namespace ZafiraIntegration
         public String URL { get; set; }
 
         /// <summary>
-        /// Optional Request Access Token
+        /// Optional Auth Token
         /// </summary>
-        public String AccessToken { get; set; }
-
+        public String AuthToken { get; set; }
 
         /// <summary>
-        /// Optional Request Access Token
+        /// Optional Request Project
         /// </summary>
         public String Project { get; set; }
 
@@ -47,7 +46,6 @@ namespace ZafiraIntegration
             get { return "application/json"; }
         }
 
-        public Credentials Credentials { get; set; }
         public HttpWebRequest HttpRequest { get; internal set; }
         public HttpWebResponse HttpResponse { get; internal set; }
         public CookieContainer CookieContainer = new CookieContainer();
@@ -57,11 +55,11 @@ namespace ZafiraIntegration
         /// </summary>
         /// <param name="url">URL which request will be created</param>
         /// <param name="verb">Http Verb that will be userd in this request</param>
-        public ApiRequest(string url, string verb, string accessToken = "")
+        public ApiRequest(string url, string verb = "GET", string authToken = null)
         {
             URL = url;
             Verb = verb;
-            AccessToken = accessToken;
+            AuthToken = authToken;
         }
 
         /// <summary>
@@ -75,12 +73,9 @@ namespace ZafiraIntegration
 
         public object Execute<TT>(string url, object obj, string verb)
         {
-            
-
             if (url != null)
                 URL = url;
             
-
             if (verb != null)
                 Verb = verb;
            
@@ -97,8 +92,12 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
-                LOGGER.Info("Error (1): " + error.Message);
+                LOGGER.Error("Error (1): " + error.Message, error);
                 return ReadResponseFromError(error);
+            }
+            catch (Exception e)
+            {
+                LOGGER.Error("Error (1.2): " + e.Message, e);
             }
             return JsonConvert.DeserializeObject<TT>(ReadResponse().ResponseBody);
         }
@@ -108,7 +107,6 @@ namespace ZafiraIntegration
             if (url != null)
                 URL = URL + url;
             
-
             HttpRequest = CreateRequest();
             LOGGER.Info("Request (2): " + HttpRequest.ToString());
 
@@ -119,8 +117,12 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
-                LOGGER.Info("Error (2): " + error.Message);
+                LOGGER.Error("Error (2): " + error.Message, error);
                 return ReadResponseFromError(error);
+            }
+            catch (Exception e)
+            {
+                LOGGER.Error("Error (2.2): " + e.Message, e);
             }
             return JsonConvert.DeserializeObject<TT>(ReadResponse().ResponseBody);
         }
@@ -129,7 +131,6 @@ namespace ZafiraIntegration
         {
             if (URL == null)
                 throw new ArgumentException("URL cannot be null.");
-            
 
             HttpRequest = CreateRequest();
             LOGGER.Info("Request (3): " + HttpRequest.ToString());
@@ -141,8 +142,12 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
-                LOGGER.Info("Error (3): " + error.Message);
+                LOGGER.Error("Error (3): " + error.Message, error);
                 return ReadResponseFromError(error);
+            }
+            catch (Exception e)
+            {
+                LOGGER.Error("Error (3.2): " + e.Message, e);
             }
             return JsonConvert.DeserializeObject<TT>(ReadResponse().ResponseBody);
         }
@@ -156,17 +161,14 @@ namespace ZafiraIntegration
         /// <returns></returns>
         public object Execute(string url, object obj, string verb)
         {
-            
-
             if (url != null)
                 URL = URL + url;
-            
 
             if (verb != null)
                 Verb = verb;
-            
 
             HttpRequest = CreateRequest();
+            LOGGER.Info("Request (4): " + HttpRequest.ToString());
             LOGGER.Info("Request URL: " + URL);
             LOGGER.Info("Request Headers: " + HttpRequest.Headers.ToString());
             LOGGER.Info("Request Method: " + HttpRequest.Method);
@@ -181,7 +183,12 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
+                LOGGER.Error("Error (4): " + error.Message, error);
                 return ReadResponseFromError(error);
+            }
+            catch (Exception e)
+            {
+                LOGGER.Error("Error (4.2): " + e.Message, e);
             }
             return ReadResponse();
         }
@@ -196,7 +203,6 @@ namespace ZafiraIntegration
         /// <returns></returns>
         public object Execute(string url, object obj, string verb, string acceptHeader)
         {
-
             if (url != null)
                 URL = URL + url;
 
@@ -204,7 +210,7 @@ namespace ZafiraIntegration
                 Verb = verb;
 
             HttpRequest = CreateRequest(acceptHeader);
-            LOGGER.Info("Request (4): " + HttpRequest.ToString());
+            LOGGER.Info("Request (5): " + HttpRequest.ToString());
 
             WriteStream(obj);
 
@@ -215,8 +221,12 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
-                LOGGER.Info("Error (4): " + error.Message);
+                LOGGER.Error("Error (5): " + error.Message, error);
                 return ReadResponseFromError(error);
+            }
+            catch (Exception e)
+            {
+                LOGGER.Error("Error (5.2): " + e.Message, e);
             }
             return ReadResponse();
         }
@@ -230,16 +240,14 @@ namespace ZafiraIntegration
         /// <returns></returns>
         public object Execute(string url, string urlDataKey, object obj, string verb)
         {
-            
             if (url != null)
                 URL = URL + urlDataKey;
 
             if (verb != null)
                 Verb = verb;
             
-
             HttpRequest = CreateRequest();
-            LOGGER.Info("Request (5): " + HttpRequest.ToString());
+            LOGGER.Info("Request (6): " + HttpRequest.ToString());
             WriteStream(obj);
             try
             {
@@ -248,8 +256,12 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
-                LOGGER.Info("Error (5): " + error.Message);
+                LOGGER.Error("Error (6): " + error.Message, error);
                 return ReadResponseFromError(error);
+            }
+            catch (Exception e)
+            {
+                LOGGER.Error("Error (6.2): " + e.Message, e);
             }
             return ReadResponse();
         }
@@ -257,17 +269,16 @@ namespace ZafiraIntegration
         /// Executes http request passing url
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="sAccessToken"></param>
         /// <returns></returns>
         public object Execute(string url)
         {
             if (url != null)
                 URL = URL + url;
             
-
             HttpRequest = CreateRequest(); ;
-            LOGGER.Info("Request (6) Uri is: " + HttpRequest.RequestUri.OriginalString);
-            LOGGER.Info("Request (6) Headers are: " + HttpRequest.Headers);
+            LOGGER.Info("Request (7): " + HttpRequest.ToString());
+            LOGGER.Info("Request (7) Uri is: " + HttpRequest.RequestUri.OriginalString);
+            LOGGER.Info("Request (7) Headers are: " + HttpRequest.Headers);
             try
             {
                 HttpResponse = (HttpWebResponse)HttpRequest.GetResponse();
@@ -276,12 +287,12 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
-                LOGGER.Info("Error (6): " + error.Message);
+                LOGGER.Error("Error (7): " + error.Message, error);
                 return ReadResponseFromError(error);
             }
             catch (Exception e)
             {
-                LOGGER.Info("Error Seen on API Call: " + e.Message);
+                LOGGER.Error("Error (7.2): " + e.Message, e);
             }
             return ReadResponse();
         }
@@ -294,9 +305,8 @@ namespace ZafiraIntegration
             if (URL == null)
                 throw new ArgumentException("URL cannot be null.");
             
-
             HttpRequest = CreateRequest();
-            LOGGER.Info("Request (7): " + HttpRequest.ToString());
+            LOGGER.Info("Request (8): " + HttpRequest.ToString());
 
             try
             {
@@ -305,15 +315,18 @@ namespace ZafiraIntegration
             catch (WebException error)
             {
                 HttpResponse = (HttpWebResponse)error.Response;
-                LOGGER.Info("Error (7): " + error.Message);
+                LOGGER.Error("Error (8): " + error.Message, error);
                 return ReadResponseFromError(error);
+            }
+            catch (Exception e)
+            {
+                LOGGER.Error("Error (8.2): " + e.Message, e);
             }
             return ReadResponse();
         }
         /// <summary>
         /// Creates HttpWebRequest
         /// </summary>
-        /// <param name="sAccessToken"></param>
         /// <returns></returns>
         internal HttpWebRequest CreateRequest()
         {
@@ -321,12 +334,12 @@ namespace ZafiraIntegration
             basicRequest.ContentType = Content;
             basicRequest.Method = Verb;
             //basicRequest.CookieContainer = CookieContainer;
-            //basicRequest.Headers.Add("Authorization", "Bearer " + AccessToken);
+            //basicRequest.Headers.Add("Authorization", "Bearer " + AuthToken);
             basicRequest.Accept = "application/json";
             
-            if (AccessToken != null)
+            if (AuthToken != null)
             {
-                basicRequest.Headers.Add("Authorization", AccessToken);
+                basicRequest.Headers.Add("Authorization", AuthToken);
             }
 
             if (Project != null)
@@ -334,17 +347,13 @@ namespace ZafiraIntegration
                 basicRequest.Headers.Add("Project", Project);
             }
            
-
-            if (Credentials != null)
-                basicRequest.Headers.Add("Authorization", "Basic" + " " + EncodeCredentials(Credentials));
-
             return basicRequest;
         }
 
         /// <summary>
         /// Creates HttpWebRequest
         /// </summary>
-        /// <param name="sAccessToken"></param>
+        /// <param name="sAcceptHeader"></param>
         /// <returns></returns>
         internal HttpWebRequest CreateRequest(string acceptHeader)
         {
@@ -352,22 +361,18 @@ namespace ZafiraIntegration
             basicRequest.ContentType = Content;
             basicRequest.Method = Verb;
             //basicRequest.CookieContainer = CookieContainer;
-            //basicRequest.Headers.Add("Authorization", "Bearer " + AccessToken);
+            //basicRequest.Headers.Add("Authorization", "Bearer " + AuthToken);
             basicRequest.Accept = acceptHeader;
 
-            if (AccessToken != null)
+            if (AuthToken != null)
             {
-                basicRequest.Headers.Add("Authorization", AccessToken);
+                basicRequest.Headers.Add("Authorization", AuthToken);
             }
 
             if (Project != null)
             {
                 basicRequest.Headers.Add("Project", Project);
             }
-
-
-            if (Credentials != null)
-                basicRequest.Headers.Add("Authorization", "Basic" + " " + EncodeCredentials(Credentials));
 
             return basicRequest;
         }
@@ -401,7 +406,7 @@ namespace ZafiraIntegration
         /// <returns></returns>
         internal ResponseStatus ReadResponse()
         {
-           
+
             ResponseStatus status = new ResponseStatus();
             if (HttpResponse != null)
                 using (var streamReader = new StreamReader(HttpResponse.GetResponseStream()))
@@ -409,15 +414,7 @@ namespace ZafiraIntegration
                     WebHeaderCollection header = HttpResponse.Headers;
                     if (!header.Equals(null))
                     {
-                        try
-                        {
-                            
-                            status.Header = header.ToString();
-                        }
-                        catch (Exception e)
-                        {
-                            LOGGER.Info("Response Exception: " + e.Message);
-                        }
+                        status.Header = header.ToString();
                     }
                     status.StatusCode = ((int)HttpResponse.StatusCode).ToString();
                     status.StatusMessage = HttpResponse.StatusDescription.ToString();
@@ -439,14 +436,7 @@ namespace ZafiraIntegration
             ResponseStatus status = new ResponseStatus();
             if (!header.Equals(null))
             {
-                try
-                {
-                   
-                    status.Header = header.ToString();
-                }
-                catch (Exception e)
-                {
-                }
+                status.Header = header.ToString();
             }
 
             status.StatusCode = ((int)HttpResponse.StatusCode).ToString();

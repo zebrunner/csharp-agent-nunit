@@ -1,6 +1,5 @@
 ﻿using NLog;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
 using System;
 using System.Configuration;
 using System.IO;
@@ -11,10 +10,11 @@ namespace ZafiraIntegration
 {
     public class ZafiraListener
     {
+
+
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static string ANONYMOUS = "anonymous";
         private string JIRA_SUITE_ID;
-        private bool ZAFIRA_ENABLED;
         private string ZAFIRA_URL;
         private string ZAFIRA_ACCESS_TOKEN;
         private string ZAFIRA_PROJECT;
@@ -36,6 +36,8 @@ namespace ZafiraIntegration
         [ThreadStatic]
         private static TestCaseType testCase;
 
+        private bool isEnabled;
+        private bool isAvailable = false;
         private bool isInitialized = false;
 
         public void OnStart(AttributeTargets attributeTarget)
@@ -124,6 +126,8 @@ namespace ZafiraIntegration
             try
             {
                 ci = new CIConfig();
+                isEnabled = GetBoolean("isEnabled", false);
+
                 ci.setCiRunId(GetString("ci_run_id", Guid.NewGuid().ToString()));
                 ci.setCiUrl(GetString("ci_url", "http://localhost:8080/job/unavailable"));
                 ci.setCiBuild(GetString("ci_build", null));
@@ -139,7 +143,6 @@ namespace ZafiraIntegration
                 ci.setGitUrl(GetString("git_url", null));
 
                 JIRA_SUITE_ID = GetString("jira_suite_id", null);
-                ZAFIRA_ENABLED = GetBoolean("zafira_enabled", false);
                 ZAFIRA_URL = GetString("zafira_service_url", "http://demo.qaprosoft.com/zafira-ws");
                 ZAFIRA_ACCESS_TOKEN = GetString("zafira_access_token", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicGFzc3dvcmQiOiIySDl5ZVhNcWoxb1lLVm1WZlYxY28vZ3ZYdmRHejdxTiIsImV4cCI6MTMwMzY3NTM4MTk1fQ.yqp4BJd7OpgX7aOdQOjGKdYb2DvHK2ds6ilc0MoO6p_vkbZhkjIK-eCr8dhT7Riwj8x6ru0Lup6Zj-FithCfOw");
                 ZAFIRA_PROJECT = GetString("zafira_project", "DemoTest");
@@ -150,14 +153,14 @@ namespace ZafiraIntegration
                 ZAFIRA_REPORT_SHOW_FAILURES_ONLY = GetBoolean("zafira_report_failures_only", false);
                 ZAFIRA_CONFIGURATOR = GetString("zafira_configurator", "com.qaprosoft.zafira.listener.DefaultConfigurator");
 
-                if (ZAFIRA_ENABLED)
+                if (isEnabled)
                 {
                     logger.Info("Zafira is Enabled (1)");
                     zc = new ZafiraClient(ZAFIRA_URL, ZAFIRA_ACCESS_TOKEN, ZAFIRA_PROJECT);
 
-                    ZAFIRA_ENABLED = zc.isAvailable();
+                    isEnabled = zc.isAvailable();
 
-                    if (ZAFIRA_ENABLED)
+                    if (isEnabled)
                     {
                         logger.Info("Zafira is Enabled (2)");
                         var auth = zc.refreshToken(ZAFIRA_ACCESS_TOKEN);
@@ -167,13 +170,13 @@ namespace ZafiraIntegration
                         }
                         else
                         {
-                            ZAFIRA_ENABLED = false;
+                            isEnabled = false;
                         }
                     }
 
-                    logger.Info("Zafira is " + (ZAFIRA_ENABLED ? "available" : "unavailable"));
+                    logger.Info("Zafira is " + (isEnabled ? "available" : "unavailable"));
                 }
-                isInitialized = ZAFIRA_ENABLED;
+                isInitialized = isEnabled;
             }
             catch (Exception e)
             {
@@ -193,7 +196,7 @@ namespace ZafiraIntegration
                 run = zc.startTestRun(new TestRunType("", suite.id, user.id, "", "", "", configXml, job.id, parentJob.id, ci.getCiBuild(), Initiator.HUMAN.ToString(), ""));
             } else
             {
-                logger.Info("Failed to Initialize Zafira");
+                logger.Info("Failed to Initialize Zafira!");
             }
             return;
         }

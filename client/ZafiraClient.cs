@@ -44,7 +44,7 @@ namespace ZafiraIntegration
             return new ApiRequest
             {
                 URL = ServiceURL,
-                AccessToken = AuthToken,
+                AuthToken = AuthToken,
                 Project = Project
             };
         }

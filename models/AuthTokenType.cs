@@ -7,13 +7,13 @@ namespace ZafiraIntegration.models
     public class AuthTokenType : AbstractType
     {
         [DataMember]
-        public String type { get; set; }
+        public String authTokenType { get; set; }
         [DataMember]
         public String authToken { get; set; }
         [DataMember]
         public String refreshToken { get; set; }
         [DataMember]
-        public String expiresIn { get; set; }
+        public String authTokenExpirationInSecs { get; set; }
 
         public AuthTokenType()
         { }

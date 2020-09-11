@@ -40,12 +40,13 @@ namespace ZafiraIntegration
             InitZafira(attributeTarget);
         }
 
-        public void OnTestStart()
+        public void OnTestStart(AttributeTargets attributeTarget)
         {
-            logger.Info("Zafira is Attempting to Register a New Tests...");
-            if (isInitialized)
+            InitZafira(attributeTarget);
+
+            if (isAvailable)
             {
-                logger.Info("Zafira is Enabled has been found...");
+                logger.Info("Zafira is Attempting to Register a New Tests...");
                 var fullName = TestContext.CurrentContext.Test.FullName;
                 var className = TestContext.CurrentContext.Test.ClassName;
                 var methodName = TestContext.CurrentContext.Test.MethodName;
@@ -59,13 +60,13 @@ namespace ZafiraIntegration
                 test.artifacts.Add(new TestArtifactType("Log", ci.getCiUrl() + "/" + ci.getCiBuild() + "/Logs/" + testName + "/test.log"));
                 test = zc.startTest(test);
             } else {
-                logger.Info("Zafira is NOT Enabled correctly..");
+                logger.Error("Zafira is not available!");
             }
         }
 
         public void OnTestFinish()
         {
-            if (isInitialized)
+            if (isAvailable)
             {
                 if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Failed))
                 {
@@ -89,7 +90,7 @@ namespace ZafiraIntegration
 
         public void OnFinish()
         {
-            if (isInitialized)
+            if (isAvailable)
             {
                 var finishedTestRun = zc.finishTestRun(run.id);
                 var sentReport = zc.sendTestRunReport(run.id, ZAFIRA_REPORT_EMAILS, false, true);
@@ -108,20 +109,18 @@ namespace ZafiraIntegration
 
         private void InitZafira(AttributeTargets attributeTarget)
         {
-            isEnabled = GetBoolean("isEnabled", false);
+            isEnabled = GetBoolean("zafira_enabled", false);
             if (!isEnabled)
             {
-                logger.Info("Zafira is not enabled");
+                logger.Info("Zafira is not enabled.");
                 return;
             }
 
             if (isInitialized)
             {
-                logger.Info("Zafira already initialized");
+                logger.Info("Zafira already initialized.");
                 return;
             }
-
-            logger.Info("Attempting to init Zafira Client...");
 
             try
             {
@@ -140,56 +139,51 @@ namespace ZafiraIntegration
                 ci.setGitCommit(GetString("git_commit", null));
                 ci.setGitUrl(GetString("git_url", null));
 
-                ZAFIRA_URL = GetString("zafira_service_url", "http://demo.qaprosoft.com");
+                ZAFIRA_URL = GetString("zafira_service_url", "");
                 ZAFIRA_ACCESS_TOKEN = GetString("zafira_access_token", "");
                 ZAFIRA_PROJECT = GetString("zafira_project", "UNKNOWN");
                 ZAFIRA_REPORT_EMAILS = GetString("zafira_report_emails", "").Trim().Replace(" ", ",").Replace(";", ",");
 
-                if (isEnabled)
+                logger.Info("Attempting to init Zafira Client...");
+                zc = new ZafiraClient(ZAFIRA_URL, ZAFIRA_PROJECT);
+
+                isAvailable = zc.isAvailable();
+                if (isAvailable)
                 {
-                    logger.Info("Zafira is Enabled (1)");
-                    zc = new ZafiraClient(ZAFIRA_URL, ZAFIRA_ACCESS_TOKEN, ZAFIRA_PROJECT);
-
-                    isEnabled = zc.isAvailable();
-
-                    if (isEnabled)
+                    logger.Info("Zafira is available. Refreshing authToken...");
+                    var auth = zc.refreshToken(ZAFIRA_ACCESS_TOKEN);
+                    if (auth != null)
                     {
-                        logger.Info("Zafira is Enabled (2)");
-                        var auth = zc.refreshToken(ZAFIRA_ACCESS_TOKEN);
-                        if (auth != null)
-                        {
-                            zc.AuthToken = auth.type + " " + auth.authToken;
-                        }
-                        else
-                        {
-                            isEnabled = false;
-                        }
+                        zc.AuthToken = auth.authTokenType + " " + auth.authToken;
+                        logger.Info("Zafira authToken is: " + zc.AuthToken);
                     }
-
-                    logger.Info("Zafira is " + (isEnabled ? "available" : "unavailable"));
+                    else
+                    {
+                        isAvailable = false;
+                        logger.Info("Unable to get Zafira authToken!");
+                        return;
+                    }
                 }
-                isInitialized = isEnabled;
+
+                logger.Info("Zafira is " + (isAvailable ? "available" : "unavailable"));
             }
             catch (Exception e)
             {
-                logger.Error("Unable to locate init ZafiraClient ", e);
+                logger.Error("Unable to init ZafiraClient!", e);
             }
 
-            if (isInitialized)
-            {
-                user = zc.getUser(ci.getCiUserId());
-                suite = zc.createTestSuite(new TestSuiteType(GetSuiteName(attributeTarget), "--", user.id));
-                parentJob = zc.registerJob(ci.getCiParentUrl(), user.id);
-                job = zc.registerJob(ci.getCiUrl(), user.id);
-                String configXml = "<config>"
-                    + "<arg unique=\"false\"><key>platform</key><value>" + Environment.GetEnvironmentVariable("platform") + "</value></arg>"
-                    + "<arg unique=\"false\"><key>env</key><value>" + Environment.GetEnvironmentVariable("env") + "</value></arg>"
-                    + "</config>";
-                run = zc.startTestRun(new TestRunType("", suite.id, user.id, "", "", "", configXml, job.id, parentJob.id, ci.getCiBuild(), Initiator.HUMAN.ToString(), ""));
-            } else
-            {
-                logger.Info("Failed to Initialize Zafira!");
-            }
+            user = zc.getUser(ci.getCiUserId());
+            suite = zc.createTestSuite(new TestSuiteType(GetSuiteName(attributeTarget), "--", user.id));
+            parentJob = zc.registerJob(ci.getCiParentUrl(), user.id);
+            job = zc.registerJob(ci.getCiUrl(), user.id);
+            String configXml = "<config>"
+                + "<arg unique=\"false\"><key>platform</key><value>" + Environment.GetEnvironmentVariable("platform") + "</value></arg>"
+                + "<arg unique=\"false\"><key>env</key><value>" + Environment.GetEnvironmentVariable("env") + "</value></arg>"
+                + "</config>";
+            run = zc.startTestRun(new TestRunType("", suite.id, user.id, "", "", "", configXml, job.id, parentJob.id, ci.getCiBuild(), Initiator.HUMAN.ToString(), ""));
+
+            isInitialized = true;
+
             return;
         }
 

@@ -26,7 +26,7 @@ namespace ZafiraIntegration
 
         public void BeforeTest(ITest test)
         {
-            zafiraListener.OnTestStart();
+            zafiraListener.OnTestStart(AttributeTargets.Class);
         }
 
         public void AfterTest(ITest test)

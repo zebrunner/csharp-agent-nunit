@@ -22,10 +22,9 @@ namespace ZafiraIntegration
         public String URL { get; set; }
 
         /// <summary>
-        /// Optional Request Auth Token
+        /// Optional Auth Token
         /// </summary>
         public String AuthToken { get; set; }
-
 
         /// <summary>
         /// Optional Request Project
@@ -47,7 +46,6 @@ namespace ZafiraIntegration
             get { return "application/json"; }
         }
 
-        public Credentials Credentials { get; set; }
         public HttpWebRequest HttpRequest { get; internal set; }
         public HttpWebResponse HttpResponse { get; internal set; }
         public CookieContainer CookieContainer = new CookieContainer();
@@ -57,7 +55,7 @@ namespace ZafiraIntegration
         /// </summary>
         /// <param name="url">URL which request will be created</param>
         /// <param name="verb">Http Verb that will be userd in this request</param>
-        public ApiRequest(string url, string verb, string authToken = "")
+        public ApiRequest(string url, string verb = "GET", string authToken = null)
         {
             URL = url;
             Verb = verb;
@@ -341,7 +339,7 @@ namespace ZafiraIntegration
             
             if (AuthToken != null)
             {
-                basicRequest.Headers.Add("Authorization", "Bearer " + AuthToken);
+                basicRequest.Headers.Add("Authorization", AuthToken);
             }
 
             if (Project != null)
@@ -349,10 +347,6 @@ namespace ZafiraIntegration
                 basicRequest.Headers.Add("Project", Project);
             }
            
-
-            if (Credentials != null)
-                basicRequest.Headers.Add("Authorization", "Basic" + " " + EncodeCredentials(Credentials));
-
             return basicRequest;
         }
 
@@ -372,17 +366,13 @@ namespace ZafiraIntegration
 
             if (AuthToken != null)
             {
-                basicRequest.Headers.Add("Authorization", "Bearer " + AuthToken);
+                basicRequest.Headers.Add("Authorization", AuthToken);
             }
 
             if (Project != null)
             {
                 basicRequest.Headers.Add("Project", Project);
             }
-
-
-            if (Credentials != null)
-                basicRequest.Headers.Add("Authorization", "Basic" + " " + EncodeCredentials(Credentials));
 
             return basicRequest;
         }

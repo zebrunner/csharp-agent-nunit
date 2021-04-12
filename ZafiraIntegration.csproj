@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\NUnit.3.13.1\build\NUnit.props" Condition="Exists('packages\NUnit.3.13.1\build\NUnit.props')" />
   <Import Project="packages\Costura.Fody.3.3.2\build\Costura.Fody.props" Condition="Exists('packages\Costura.Fody.3.3.2\build\Costura.Fody.props')" />
-  <Import Project="packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('packages\NUnit.3.11.0\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>ZafiraIntegration</RootNamespace>
     <AssemblyName>ZafiraIntegration</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
@@ -44,18 +44,29 @@
     <Reference Include="Costura, Version=3.3.2.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>packages\Costura.Fody.3.3.2\lib\net40\Costura.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.13.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
+      <HintPath>packages\NUnit.3.13.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=106.11.7.0, Culture=neutral, PublicKeyToken=598062e77f915f75">
+      <HintPath>packages\RestSharp.106.11.7\lib\net452\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp.Serializers.NewtonsoftJson, Version=106.11.7.0, Culture=neutral, PublicKeyToken=598062e77f915f75">
+      <HintPath>packages\RestSharp.Serializers.NewtonsoftJson.106.11.7\lib\net452\RestSharp.Serializers.NewtonsoftJson.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,32 +78,28 @@
     <Compile Include="attributes\ZafiraClass.cs" />
     <Compile Include="attributes\ZafiraAssembly.cs" />
     <Compile Include="attributes\ZafiraTest.cs" />
-    <Compile Include="http\ApiRequest.cs" />
-    <Compile Include="config\CIConfig.cs" />
-    <Compile Include="http\Credentials.cs" />
-    <Compile Include="http\FileUpload.cs" />
-    <Compile Include="http\Httpresponse.cs" />
-    <Compile Include="http\ResponseStatus.cs" />
-    <Compile Include="http\User.cs" />
-    <Compile Include="models\AbstractType.cs" />
-    <Compile Include="models\AuthTokenType.cs" />
-    <Compile Include="models\DriverMode.cs" />
-    <Compile Include="models\Initiator.cs" />
-    <Compile Include="models\Status.cs" />
-    <Compile Include="models\EmailType.cs" />
-    <Compile Include="models\JobType.cs" />
-    <Compile Include="models\ProjectType.cs" />
-    <Compile Include="models\RefreshTokenType.cs" />
-    <Compile Include="models\TestArtifactType.cs" />
-    <Compile Include="models\TestCaseType.cs" />
-    <Compile Include="models\TestRunType.cs" />
-    <Compile Include="models\TestSuiteType.cs" />
-    <Compile Include="models\TestType.cs" />
-    <Compile Include="models\UserType.cs" />
+    <Compile Include="Client\Requests\ArtifactReference.cs" />
+    <Compile Include="Client\Requests\FinishTestRequest.cs" />
+    <Compile Include="Client\Requests\FinishTestRunRequest.cs" />
+    <Compile Include="Client\Requests\Log.cs" />
+    <Compile Include="Client\Requests\RefreshAccessTokenRequest.cs" />
+    <Compile Include="Client\Requests\StartTestRequest.cs" />
+    <Compile Include="Client\Requests\StartTestRunRequest.cs" />
+    <Compile Include="Client\Responses\RefreshAccessTokenResponse.cs" />
+    <Compile Include="Client\Responses\SaveTestRunResponse.cs" />
+    <Compile Include="Client\Responses\SaveTestResponse.cs" />
+    <Compile Include="Client\ZebrunnerApiClient.cs" />
+    <Compile Include="Config\Configuration.cs" />
+    <Compile Include="Config\ConfigurationProvider.cs" />
+    <Compile Include="Config\provider\EnvironmentVariablesConfigurationProvider.cs" />
+    <Compile Include="Logging\ZebrunnerNLogTarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="attributes\ZafiraAssemblyTest.cs" />
-    <Compile Include="client\ZafiraClient.cs" />
-    <Compile Include="listener\ZafiraListener.cs" />
+    <Compile Include="Registrar\Artifact.cs" />
+    <Compile Include="Registrar\RunContext.cs" />
+    <Compile Include="Registrar\ReportingRegistrar.cs" />
+    <Compile Include="Registrar\Screenshot.cs" />
+    <Compile Include="Registrar\TestRunRegistrar.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -103,7 +110,6 @@
   <ItemGroup>
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
@@ -113,9 +119,9 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit.3.11.0\build\NUnit.props'))" />
     <Error Condition="!Exists('packages\Fody.3.3.5\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Fody.3.3.5\build\Fody.targets'))" />
     <Error Condition="!Exists('packages\Costura.Fody.3.3.2\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Costura.Fody.3.3.2\build\Costura.Fody.props'))" />
+    <Error Condition="!Exists('packages\NUnit.3.13.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit.3.13.1\build\NUnit.props'))" />
   </Target>
   <Import Project="packages\Fody.3.3.5\build\Fody.targets" Condition="Exists('packages\Fody.3.3.5\build\Fody.targets')" />
 </Project>

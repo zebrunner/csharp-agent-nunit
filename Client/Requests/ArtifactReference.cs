@@ -2,7 +2,13 @@
 {
     public class ArtifactReference
     {
-        public string Name { get; set; }
-        public string Value { get; set; }
+        public string Name { get; }
+        public string Value { get; }
+
+        public ArtifactReference(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
     }
 }

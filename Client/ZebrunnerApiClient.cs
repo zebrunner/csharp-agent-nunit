@@ -20,6 +20,7 @@ namespace ZafiraIntegration.Client
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly RestClient _restClient;
+        private readonly string authenticationToken;
 
         private ZebrunnerApiClient()
         {
@@ -32,6 +33,7 @@ namespace ZafiraIntegration.Client
 
             var response = _restClient.Post<RefreshAccessTokenResponse>(request);
             _restClient.Authenticator = new JwtAuthenticator(response.Data.AuthToken);
+            this.authenticationToken = response.Data.AuthToken;
         }
 
         private static string Iam(string resourceUri)
@@ -95,7 +97,9 @@ namespace ZafiraIntegration.Client
 
         public void UploadScreenshot(long testRunId, long testId, byte[] bytes, DateTimeOffset capturedAt)
         {
-            var httpClient = new HttpClient();
+            var httpClient = new HttpClient {BaseAddress = new Uri(Configuration.GetServerHost())};
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", authenticationToken);
 
             var httpContent = new ByteArrayContent(bytes);
             httpContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
@@ -158,6 +162,30 @@ namespace ZafiraIntegration.Client
             if (response.StatusCode != HttpStatusCode.NoContent)
             {
                 Logger.Error($"Could not attach test artifact reference. Response body: {response.Content}");
+            }
+        }
+
+        public void AttachLabelsToTestRun(long testRunId, IList<Label> labels)
+        {
+            var request = new RestRequest(Reporting($"/v1/test-runs/{testRunId}/labels"));
+            request.AddJsonBody(new JsonObject {["items"] = labels});
+
+            var response = _restClient.Put<string>(request);
+            if (response.StatusCode != HttpStatusCode.NoContent)
+            {
+                Logger.Error($"Could not attach test run labels. Response body: {response.Content}");
+            }
+        }
+
+        public void AttachLabelsToTest(long testRunId, long testId, IList<Label> labels)
+        {
+            var request = new RestRequest(Reporting($"/v1/test-runs/{testRunId}/tests/{testId}/labels"));
+            request.AddJsonBody(new JsonObject {["items"] = labels});
+
+            var response = _restClient.Put<string>(request);
+            if (response.StatusCode != HttpStatusCode.NoContent)
+            {
+                Logger.Error($"Could not attach test labels. Response body: {response.Content}");
             }
         }
     }

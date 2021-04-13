@@ -1,4 +1,5 @@
 ﻿using System;
+using NUnit.Framework.Interfaces;
 
 namespace ZafiraIntegration.Registrar
 {
@@ -8,7 +9,7 @@ namespace ZafiraIntegration.Registrar
 
         void RegisterTestRunFinish();
 
-        void RegisterTestStart();
+        void RegisterTestStart(ITest test);
 
         void RegisterTestFinish();
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using NLog;
@@ -83,7 +84,7 @@ namespace ZafiraIntegration.Registrar
             RunContext.SaveTestRunResponse = saveTestRunResponse;
         }
 
-        public void RegisterTestStart()
+        public void RegisterTestStart(ITest test)
         {
             var testRunId = RunContext.SaveTestRunResponse.Id;
             var testName = TestContext.CurrentContext.Test.ClassName + "." + TestContext.CurrentContext.Test.MethodName;
@@ -93,7 +94,8 @@ namespace ZafiraIntegration.Registrar
                 ClassName = TestContext.CurrentContext.Test.ClassName,
                 MethodName = TestContext.CurrentContext.Test.MethodName,
                 Name = testName,
-                StartedAt = DateTime.UtcNow
+                StartedAt = DateTime.UtcNow,
+                Maintainer = MaintainerResolver.ResolveMaintainer(test)
             };
             var saveTestResponse = _apiClient.RegisterTestStart(testRunId, startTestRequest);
             RunContext.SetCurrentTest(saveTestResponse);

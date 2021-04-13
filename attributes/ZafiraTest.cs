@@ -14,7 +14,7 @@ namespace ZafiraIntegration
         public void BeforeTest(ITest test)
         {
             TestRunRegistrar.RegisterTestRunStart(AttributeTargets.Class);
-            TestRunRegistrar.RegisterTestStart();
+            TestRunRegistrar.RegisterTestStart(test);
         }
 
         public void AfterTest(ITest test)

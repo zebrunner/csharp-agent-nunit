@@ -2,7 +2,7 @@
 
 namespace ZafiraIntegration.Client.Responses
 {
-    public class SaveTestResponse
+    internal class SaveTestResponse
     {
         public long Id { get; set; }
         public string Name { get; set; }

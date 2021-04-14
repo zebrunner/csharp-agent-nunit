@@ -2,7 +2,7 @@
 
 namespace ZafiraIntegration.Client.Responses
 {
-    public class SaveTestRunResponse
+    internal class SaveTestRunResponse
     {
         public long Id { get; set; }
         public string Uuid { get; set; }
@@ -13,7 +13,7 @@ namespace ZafiraIntegration.Client.Responses
         public string Framework { get; set; }
         public ConfigDto Config { get; set; }
 
-        public class ConfigDto
+        internal class ConfigDto
         {
             public string Environment { get; set; }
             public string Build { get; set; }

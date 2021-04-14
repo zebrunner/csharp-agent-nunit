@@ -1,6 +1,6 @@
 ﻿namespace ZafiraIntegration.Client.Responses
 {
-    public class RefreshAccessTokenResponse
+    internal class RefreshAccessTokenResponse
     {
         public string AuthToken { get; set; }
     }

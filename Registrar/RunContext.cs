@@ -3,22 +3,32 @@ using ZafiraIntegration.Client.Responses;
 
 namespace ZafiraIntegration.Registrar
 {
-    public static class RunContext
+    internal static class RunContext
     {
-        internal static SaveTestRunResponse SaveTestRunResponse { get; set; }
+        private static SaveTestRunResponse _saveTestRunResponse;
         [ThreadStatic] private static SaveTestResponse _currentSaveTestResponse;
 
-        public static void SetCurrentTest(SaveTestResponse saveTestResponse)
+        internal static void SetCurrentTestRun(SaveTestRunResponse saveTestRunResponse)
+        {
+            _saveTestRunResponse = saveTestRunResponse;
+        }
+
+        internal static SaveTestRunResponse GetCurrentTestRun()
+        {
+            return _saveTestRunResponse;
+        }
+
+        internal static void SetCurrentTest(SaveTestResponse saveTestResponse)
         {
             _currentSaveTestResponse = saveTestResponse;
         }
 
-        public static SaveTestResponse GetCurrentTest()
+        internal static SaveTestResponse GetCurrentTest()
         {
             return _currentSaveTestResponse;
         }
 
-        public static void RemoveCurrentTest()
+        internal static void RemoveCurrentTest()
         {
             _currentSaveTestResponse = null;
         }

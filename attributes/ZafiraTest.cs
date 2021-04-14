@@ -8,7 +8,7 @@ namespace ZafiraIntegration
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class ZafiraTest : Attribute, ITestAction
     {
-        private static readonly ITestRunRegistrar TestRunRegistrar = ReportingRegistrar.Instance;
+        private static readonly ITestRunRegistrar TestRunRegistrar = TestRunRegistrarFactory.GetTestRunRegistrar();
         public ActionTargets Targets => ActionTargets.Test;
 
         public void BeforeTest(ITest test)

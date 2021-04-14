@@ -8,7 +8,7 @@ namespace ZafiraIntegration
     [AttributeUsage(AttributeTargets.Assembly)]
     public class ZafiraAssembly : Attribute, ITestAction
     {
-        private static readonly ITestRunRegistrar TestRunRegistrar = ReportingRegistrar.Instance;
+        private static readonly ITestRunRegistrar TestRunRegistrar = TestRunRegistrarFactory.GetTestRunRegistrar();
 
         public ActionTargets Targets => ActionTargets.Suite;
 

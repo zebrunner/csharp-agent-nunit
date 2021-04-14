@@ -1,6 +1,6 @@
 ﻿namespace ZafiraIntegration.Config
 {
-    public interface IConfigurationProvider
+    internal interface IConfigurationProvider
     {
         bool IsReportingEnabled();
 
@@ -9,5 +9,9 @@
         string GetAccessToken();
 
         string GetProjectKey();
+
+        string GetEnvironment();
+
+        string GetBuild();
     }
 }

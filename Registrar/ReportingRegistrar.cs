@@ -9,11 +9,12 @@ using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using ZafiraIntegration.Client;
 using ZafiraIntegration.Client.Requests;
+using ZafiraIntegration.Config;
 using ZafiraIntegration.Logging;
 
 namespace ZafiraIntegration.Registrar
 {
-    public class ReportingRegistrar : ITestRunRegistrar
+    internal class ReportingRegistrar : ITestRunRegistrar
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private const string DefaultJobUrl = "http://localhost:8080/job/unavailable";
@@ -29,28 +30,32 @@ namespace ZafiraIntegration.Registrar
             {TestStatus.Warning, "FAILED"}
         };
 
-        private readonly ZebrunnerApiClient _apiClient;
+        private readonly ZebrunnerApiClient _apiClient = ZebrunnerApiClient.Instance;
 
         private ReportingRegistrar()
         {
             Target.Register<ZebrunnerNLogTarget>("Zebrunner");
-            _apiClient = ZebrunnerApiClient.Instance;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void RegisterTestRunStart(AttributeTargets attributeTarget)
         {
-            if (RunContext.SaveTestRunResponse == null)
+            if (RunContext.GetCurrentTestRun() == null)
             {
                 var startTestRunRequest = new StartTestRunRequest
                 {
                     Name = GetSuiteName(attributeTarget),
                     Framework = "nunit",
                     StartedAt = DateTime.UtcNow,
-                    JenkinsContext = GetJenkinsContext()
+                    JenkinsContext = GetJenkinsContext(),
+                    Config = new StartTestRunRequest.ConfigDto
+                    {
+                        Environment = Configuration.GetEnvironment(),
+                        Build = Configuration.GetBuild()
+                    }
                 };
                 var saveTestRunResponse = _apiClient.RegisterTestRunStart(startTestRunRequest);
-                RunContext.SaveTestRunResponse = saveTestRunResponse;
+                RunContext.SetCurrentTestRun(saveTestRunResponse);
             }
         }
 
@@ -75,18 +80,21 @@ namespace ZafiraIntegration.Registrar
 
         public void RegisterTestRunFinish()
         {
-            var testRunId = RunContext.SaveTestRunResponse.Id;
-            var finishTestRunRequest = new FinishTestRunRequest
+            var testRun = RunContext.GetCurrentTestRun();
+            if (testRun != null)
             {
-                EndedAt = DateTime.UtcNow
-            };
-            var saveTestRunResponse = _apiClient.RegisterTestRunFinish(testRunId, finishTestRunRequest);
-            RunContext.SaveTestRunResponse = saveTestRunResponse;
+                var finishTestRunRequest = new FinishTestRunRequest
+                {
+                    EndedAt = DateTime.UtcNow
+                };
+                var saveTestRunResponse = _apiClient.RegisterTestRunFinish(testRun.Id, finishTestRunRequest);
+                RunContext.SetCurrentTestRun(saveTestRunResponse);
+            }
         }
 
         public void RegisterTestStart(ITest test)
         {
-            var testRunId = RunContext.SaveTestRunResponse.Id;
+            var testRunId = RunContext.GetCurrentTestRun().Id;
             var testName = TestContext.CurrentContext.Test.ClassName + "." + TestContext.CurrentContext.Test.MethodName;
 
             var startTestRequest = new StartTestRequest
@@ -95,7 +103,8 @@ namespace ZafiraIntegration.Registrar
                 MethodName = TestContext.CurrentContext.Test.MethodName,
                 Name = testName,
                 StartedAt = DateTime.UtcNow,
-                Maintainer = MaintainerResolver.ResolveMaintainer(test)
+                Maintainer = MaintainerResolver.ResolveMaintainer(test),
+                Labels = LabelsResolver.ResolveLabels(test)
             };
             var saveTestResponse = _apiClient.RegisterTestStart(testRunId, startTestRequest);
             RunContext.SetCurrentTest(saveTestResponse);
@@ -108,7 +117,7 @@ namespace ZafiraIntegration.Registrar
 
         public void RegisterTestFinish()
         {
-            var testRunId = RunContext.SaveTestRunResponse.Id;
+            var testRunId = RunContext.GetCurrentTestRun().Id;
             var testId = RunContext.GetCurrentTest().Id;
             var finishTestRequest = new FinishTestRequest
             {

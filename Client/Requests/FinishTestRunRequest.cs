@@ -2,7 +2,7 @@
 
 namespace ZafiraIntegration.Client.Requests
 {
-    public class FinishTestRunRequest
+    internal class FinishTestRunRequest
     {
         public DateTime EndedAt { get; set; }
     }

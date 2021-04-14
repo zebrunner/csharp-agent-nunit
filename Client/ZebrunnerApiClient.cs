@@ -14,13 +14,13 @@ using ZafiraIntegration.Config;
 
 namespace ZafiraIntegration.Client
 {
-    public class ZebrunnerApiClient
+    internal class ZebrunnerApiClient
     {
         internal static ZebrunnerApiClient Instance { get; } = new ZebrunnerApiClient();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly RestClient _restClient;
-        private readonly string authenticationToken;
+        private readonly string _authenticationToken;
 
         private ZebrunnerApiClient()
         {
@@ -33,7 +33,7 @@ namespace ZafiraIntegration.Client
 
             var response = _restClient.Post<RefreshAccessTokenResponse>(request);
             _restClient.Authenticator = new JwtAuthenticator(response.Data.AuthToken);
-            this.authenticationToken = response.Data.AuthToken;
+            _authenticationToken = response.Data.AuthToken;
         }
 
         private static string Iam(string resourceUri)
@@ -53,7 +53,12 @@ namespace ZafiraIntegration.Client
             request.AddQueryParameter("projectKey", Configuration.GetProjectKey());
 
             var response = _restClient.Post<SaveTestRunResponse>(request);
-            return response.Data;
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            throw new Exception($"Could not register start of test run. Response body is {response.Content}");
         }
 
         public SaveTestRunResponse RegisterTestRunFinish(long testRunId, FinishTestRunRequest requestBody)
@@ -62,7 +67,12 @@ namespace ZafiraIntegration.Client
             request.AddJsonBody(requestBody);
 
             var response = _restClient.Put<SaveTestRunResponse>(request);
-            return response.Data;
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            throw new Exception($"Could not register finish of test run. Response body is {response.Content}");
         }
 
         public SaveTestResponse RegisterTestStart(long testRunId, StartTestRequest requestBody)
@@ -71,7 +81,12 @@ namespace ZafiraIntegration.Client
             request.AddJsonBody(requestBody);
 
             var response = _restClient.Post<SaveTestResponse>(request);
-            return response.Data;
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            throw new Exception($"Could not register start of test. Response body is {response.Content}");
         }
 
         public SaveTestResponse RegisterTestFinish(long testRunId, long testId, FinishTestRequest requestBody)
@@ -80,7 +95,12 @@ namespace ZafiraIntegration.Client
             request.AddJsonBody(requestBody);
 
             var response = _restClient.Put<SaveTestResponse>(request);
-            return response.Data;
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            throw new Exception($"Could not register finish of test. Response body is {response.Content}");
         }
 
         public void SendLogs(long testRunId, List<Log> requestBody)
@@ -99,7 +119,7 @@ namespace ZafiraIntegration.Client
         {
             var httpClient = new HttpClient {BaseAddress = new Uri(Configuration.GetServerHost())};
             httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", authenticationToken);
+                new AuthenticationHeaderValue("Bearer", _authenticationToken);
 
             var httpContent = new ByteArrayContent(bytes);
             httpContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");

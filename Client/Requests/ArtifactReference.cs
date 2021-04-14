@@ -1,6 +1,6 @@
 ﻿namespace ZafiraIntegration.Client.Requests
 {
-    public class ArtifactReference
+    internal class ArtifactReference
     {
         public string Name { get; }
         public string Value { get; }

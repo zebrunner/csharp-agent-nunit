@@ -1,6 +1,6 @@
 ﻿namespace ZafiraIntegration.Client.Requests
 {
-    public class Log
+    internal class Log
     {
         public long TestId { get; set; }
         public string Message { get; set; }

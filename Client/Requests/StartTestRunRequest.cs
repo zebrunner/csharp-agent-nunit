@@ -2,7 +2,7 @@
 
 namespace ZafiraIntegration.Client.Requests
 {
-    public class StartTestRunRequest
+    internal class StartTestRunRequest
     {
         public string Uuid { get; set; }
         public string Name { get; set; }
@@ -11,13 +11,13 @@ namespace ZafiraIntegration.Client.Requests
         public ConfigDto Config { get; set; }
         public JenkinsContextDto JenkinsContext { get; set; }
 
-        public class ConfigDto
+        internal class ConfigDto
         {
             public string Environment { get; set; }
             public string Build { get; set; }
         }
 
-        public class JenkinsContextDto
+        internal class JenkinsContextDto
         {
             public string JobUrl { get; set; }
             public string JobNumber { get; set; }

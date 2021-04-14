@@ -1,42 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ZafiraIntegration.Config.Provider;
 
 namespace ZafiraIntegration.Config
 {
-    public static class Configuration
+    internal static class Configuration
     {
         private static readonly List<IConfigurationProvider> ConfigurationProviders = new List<IConfigurationProvider>
         {
             new EnvironmentVariablesConfigurationProvider()
         };
 
-        public static bool IsReportingEnabled()
+        internal static bool IsReportingEnabled()
         {
             return ConfigurationProviders
                 .Select(provider => provider.IsReportingEnabled())
-                .First(isReportingEnabled => isReportingEnabled);
+                .FirstOrDefault(isReportingEnabled => isReportingEnabled);
         }
 
-        public static string GetServerHost()
+        internal static string GetServerHost()
         {
-            return ConfigurationProviders
-                .Select(provider => provider.GetServerHost())
-                .First(serverHost => serverHost != null && serverHost.Trim().Length != 0);
+            return GetStringProperty(provider => provider.GetServerHost());
         }
 
-        public static string GetAccessToken()
+        internal static string GetAccessToken()
         {
-            return ConfigurationProviders
-                .Select(provider => provider.GetAccessToken())
-                .First(accessToken => accessToken != null && accessToken.Trim().Length != 0);
+            return GetStringProperty(provider => provider.GetAccessToken());
         }
 
-        public static string GetProjectKey()
+        internal static string GetProjectKey()
+        {
+            return GetStringProperty(provider => provider.GetProjectKey());
+        }
+
+        internal static string GetEnvironment()
+        {
+            return GetStringProperty(provider => provider.GetEnvironment());
+        }
+
+        internal static string GetBuild()
+        {
+            return GetStringProperty(provider => provider.GetBuild());
+        }
+
+        private static string GetStringProperty(Func<IConfigurationProvider, string> propertyResolver)
         {
             return ConfigurationProviders
-                .Select(provider => provider.GetProjectKey())
-                .First(projectKey => projectKey != null && projectKey.Trim().Length != 0);
+                .Select(propertyResolver)
+                .FirstOrDefault(property => property != null && property.Trim().Length != 0);
         }
     }
 }

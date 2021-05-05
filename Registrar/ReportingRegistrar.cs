@@ -61,7 +61,7 @@ namespace ZafiraIntegration.Registrar
 
         private string GetSuiteName(AttributeTargets attributeTarget)
         {
-            var ciUrl = Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl;
+            var ciUrl = (Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl).TrimEnd('/');
             return attributeTarget == AttributeTargets.Assembly
                 ? ciUrl.Substring(ciUrl.LastIndexOf('/') + 1)
                 : TestContext.CurrentContext.Test.FullName;
@@ -71,7 +71,7 @@ namespace ZafiraIntegration.Registrar
         {
             return new StartTestRunRequest.JenkinsContextDto
             {
-                JobUrl = Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl,
+                JobUrl = (Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl).TrimEnd('/'),
                 JobNumber = Environment.GetEnvironmentVariable("ci_build"),
                 ParentJobUrl = Environment.GetEnvironmentVariable("ci_parent_url") ?? DefaultParentJobUrl,
                 ParentJobNumber = Environment.GetEnvironmentVariable("ci_parent_build")
@@ -109,7 +109,7 @@ namespace ZafiraIntegration.Registrar
             var saveTestResponse = _apiClient.RegisterTestStart(testRunId, startTestRequest);
             RunContext.SetCurrentTest(saveTestResponse);
 
-            var jobUrl = Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl;
+            var jobUrl = (Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl).TrimEnd('/');
             var jobNumber = Environment.GetEnvironmentVariable("ci_build");
             Artifact.AttachReferenceToTest("Demo", $"{jobUrl}/${jobNumber}/Screenshots/${testName}/report.html");
             Artifact.AttachReferenceToTest("Log", $"{jobUrl}/${jobNumber}/Logs/${testName}/test.log");

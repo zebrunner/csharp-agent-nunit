@@ -42,6 +42,7 @@ namespace ZafiraIntegration.Registrar
         {
             if (RunContext.GetCurrentTestRun() == null)
             {
+                Logger.Debug("Registering test run start...");
                 var startTestRunRequest = new StartTestRunRequest
                 {
                     Name = GetSuiteName(attributeTarget),
@@ -56,6 +57,8 @@ namespace ZafiraIntegration.Registrar
                 };
                 var saveTestRunResponse = _apiClient.RegisterTestRunStart(startTestRunRequest);
                 RunContext.SetCurrentTestRun(saveTestRunResponse);
+
+                Logger.Debug("Test run start was registered successfuly.");
             }
         }
 
@@ -80,6 +83,7 @@ namespace ZafiraIntegration.Registrar
 
         public void RegisterTestRunFinish()
         {
+            Logger.Debug("Registering test run finish...");
             var testRun = RunContext.GetCurrentTestRun();
             if (testRun != null)
             {
@@ -89,44 +93,59 @@ namespace ZafiraIntegration.Registrar
                 };
                 var saveTestRunResponse = _apiClient.RegisterTestRunFinish(testRun.Id, finishTestRunRequest);
                 RunContext.SetCurrentTestRun(saveTestRunResponse);
+                
+                Logger.Debug("Test run finish was registered successfuly.");
             }
         }
 
         public void RegisterTestStart(ITest test)
         {
-            var testRunId = RunContext.GetCurrentTestRun().Id;
+            var testRunId = RunContext.GetCurrentTestRun()?.Id;
             var testName = TestContext.CurrentContext.Test.ClassName + "." + TestContext.CurrentContext.Test.MethodName;
+            Logger.Debug($"Registering test start for test run ${testRunId}...");
 
-            var startTestRequest = new StartTestRequest
+            if (testRunId != null)
             {
-                ClassName = TestContext.CurrentContext.Test.ClassName,
-                MethodName = TestContext.CurrentContext.Test.MethodName,
-                Name = testName,
-                StartedAt = DateTime.UtcNow,
-                Maintainer = MaintainerResolver.ResolveMaintainer(test),
-                Labels = LabelsResolver.ResolveLabels(test)
-            };
-            var saveTestResponse = _apiClient.RegisterTestStart(testRunId, startTestRequest);
-            RunContext.SetCurrentTest(saveTestResponse);
+                var startTestRequest = new StartTestRequest
+                {
+                    ClassName = TestContext.CurrentContext.Test.ClassName,
+                    MethodName = TestContext.CurrentContext.Test.MethodName,
+                    Name = testName,
+                    StartedAt = DateTime.UtcNow,
+                    Maintainer = MaintainerResolver.ResolveMaintainer(test),
+                    Labels = LabelsResolver.ResolveLabels(test)
+                };
+                var saveTestResponse = _apiClient.RegisterTestStart((long) testRunId, startTestRequest);
+                RunContext.SetCurrentTest(saveTestResponse);
 
-            var jobUrl = (Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl).TrimEnd('/');
-            var jobNumber = Environment.GetEnvironmentVariable("ci_build");
-            Artifact.AttachReferenceToTest("Demo", $"{jobUrl}/${jobNumber}/Screenshots/${testName}/report.html");
-            Artifact.AttachReferenceToTest("Log", $"{jobUrl}/${jobNumber}/Logs/${testName}/test.log");
+                var jobUrl = (Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl).TrimEnd('/');
+                var jobNumber = Environment.GetEnvironmentVariable("ci_build");
+                Artifact.AttachReferenceToTest("Demo", $"{jobUrl}/${jobNumber}/Screenshots/${testName}/report.html");
+                Artifact.AttachReferenceToTest("Log", $"{jobUrl}/${jobNumber}/Logs/${testName}/test.log");
+                
+                Logger.Debug("Test start was registered successfuly.");
+            }
         }
 
         public void RegisterTestFinish()
         {
-            var testRunId = RunContext.GetCurrentTestRun().Id;
-            var testId = RunContext.GetCurrentTest().Id;
-            var finishTestRequest = new FinishTestRequest
+            var testRunId = RunContext.GetCurrentTestRun()?.Id;
+            var testId = RunContext.GetCurrentTest()?.Id;
+            Logger.Debug($"Registering test finish for test run with id ${testRunId} and test with id ${testId}...");
+
+            if (testRunId != null && testId != null)
             {
-                EndedAt = DateTime.UtcNow,
-                Result = TestStatusToReason[TestContext.CurrentContext.Result.Outcome.Status],
-                Reason = GetFullStackTrace()
-            };
-            _apiClient.RegisterTestFinish(testRunId, testId, finishTestRequest);
-            RunContext.RemoveCurrentTest();
+                var finishTestRequest = new FinishTestRequest
+                {
+                    EndedAt = DateTime.UtcNow,
+                    Result = TestStatusToReason[TestContext.CurrentContext.Result.Outcome.Status],
+                    Reason = GetFullStackTrace()
+                };
+                _apiClient.RegisterTestFinish((long) testRunId, (long) testId, finishTestRequest);
+                RunContext.RemoveCurrentTest();
+                
+                Logger.Debug("Test finish was registered successfuly.");
+            }
         }
 
         private string GetFullStackTrace()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using NLog;
 using NLog.Targets;
 using NUnit.Framework;
@@ -42,7 +43,7 @@ namespace ZafiraIntegration.Registrar
         {
             if (RunContext.GetCurrentTestRun() == null)
             {
-                Logger.Debug("Registering test run start...");
+                Logger.Debug($"{DateTime.UtcNow} [{Thread.CurrentThread.Name}] Registering test run start...");
                 var startTestRunRequest = new StartTestRunRequest
                 {
                     Name = GetSuiteName(attributeTarget),
@@ -58,7 +59,7 @@ namespace ZafiraIntegration.Registrar
                 var saveTestRunResponse = _apiClient.RegisterTestRunStart(startTestRunRequest);
                 RunContext.SetCurrentTestRun(saveTestRunResponse);
 
-                Logger.Debug("Test run start was registered successfuly.");
+                Logger.Debug($"{DateTime.UtcNow} [{Thread.CurrentThread.Name}] ({saveTestRunResponse.Id}) Test run start was registered successfuly with id.");
             }
         }
 
@@ -83,28 +84,28 @@ namespace ZafiraIntegration.Registrar
 
         public void RegisterTestRunFinish()
         {
-            Logger.Debug("Registering test run finish...");
             var testRun = RunContext.GetCurrentTestRun();
             if (testRun != null)
             {
+                Logger.Debug($"{DateTime.UtcNow} [{Thread.CurrentThread.Name}] ({testRun.Id}) Registering test run finish...");
                 var finishTestRunRequest = new FinishTestRunRequest
                 {
                     EndedAt = DateTime.UtcNow
                 };
                 var saveTestRunResponse = _apiClient.RegisterTestRunFinish(testRun.Id, finishTestRunRequest);
                 RunContext.SetCurrentTestRun(saveTestRunResponse);
-                
-                Logger.Debug("Test run finish was registered successfuly.");
+
+                Logger.Debug($"{DateTime.UtcNow} [{Thread.CurrentThread.Name}] ({testRun.Id}) Test run finish was registered successfuly.");
             }
         }
 
         public void RegisterTestStart(ITest test)
         {
-            var testRunId = RunContext.GetCurrentTestRun()?.Id;
+            var testRun = RunContext.GetCurrentTestRun();
             var testName = TestContext.CurrentContext.Test.ClassName + "." + TestContext.CurrentContext.Test.MethodName;
-            Logger.Debug($"Registering test start for test run ${testRunId}...");
+            Logger.Debug($"{DateTime.UtcNow} [{Thread.CurrentThread.Name}]  ({testRun?.Id}) Registering test start...");
 
-            if (testRunId != null)
+            if (testRun != null)
             {
                 var startTestRequest = new StartTestRequest
                 {
@@ -115,25 +116,25 @@ namespace ZafiraIntegration.Registrar
                     Maintainer = MaintainerResolver.ResolveMaintainer(test),
                     Labels = LabelsResolver.ResolveLabels(test)
                 };
-                var saveTestResponse = _apiClient.RegisterTestStart((long) testRunId, startTestRequest);
+                var saveTestResponse = _apiClient.RegisterTestStart(testRun.Id, startTestRequest);
                 RunContext.SetCurrentTest(saveTestResponse);
 
                 var jobUrl = (Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl).TrimEnd('/');
                 var jobNumber = Environment.GetEnvironmentVariable("ci_build");
                 Artifact.AttachReferenceToTest("Demo", $"{jobUrl}/${jobNumber}/Screenshots/${testName}/report.html");
                 Artifact.AttachReferenceToTest("Log", $"{jobUrl}/${jobNumber}/Logs/${testName}/test.log");
-                
-                Logger.Debug("Test start was registered successfuly.");
+
+                Logger.Debug($"{DateTime.UtcNow} [{Thread.CurrentThread.Name}] ({testRun.Id}, {saveTestResponse.Id}) Test start was registered successfuly.");
             }
         }
 
         public void RegisterTestFinish()
         {
-            var testRunId = RunContext.GetCurrentTestRun()?.Id;
-            var testId = RunContext.GetCurrentTest()?.Id;
-            Logger.Debug($"Registering test finish for test run with id ${testRunId} and test with id ${testId}...");
+            var testRun = RunContext.GetCurrentTestRun();
+            var test = RunContext.GetCurrentTest();
+            Logger.Debug($"{DateTime.UtcNow} [{Thread.CurrentThread.Name}] ({testRun?.Id}, {test?.Id}) Registering test finish...");
 
-            if (testRunId != null && testId != null)
+            if (testRun != null && test != null)
             {
                 var finishTestRequest = new FinishTestRequest
                 {
@@ -141,10 +142,10 @@ namespace ZafiraIntegration.Registrar
                     Result = TestStatusToReason[TestContext.CurrentContext.Result.Outcome.Status],
                     Reason = GetFullStackTrace()
                 };
-                _apiClient.RegisterTestFinish((long) testRunId, (long) testId, finishTestRequest);
+                _apiClient.RegisterTestFinish(testRun.Id, test.Id, finishTestRequest);
                 RunContext.RemoveCurrentTest();
-                
-                Logger.Debug("Test finish was registered successfuly.");
+
+                Logger.Debug($"{DateTime.UtcNow} [{Thread.CurrentThread.Name}] ({testRun.Id}, {test.Id}) Test finish was registered successfuly.");
             }
         }
 

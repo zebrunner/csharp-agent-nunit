@@ -1,5 +1,6 @@
 ﻿using System;
 using NLog;
+using NLog.Layouts;
 using NLog.Targets;
 using ZafiraIntegration.Client.Requests;
 using ZafiraIntegration.Registrar;
@@ -9,7 +10,14 @@ namespace ZafiraIntegration.Logging
     [Target("Zebrunner")]
     public class ZebrunnerNLogTarget : TargetWithLayout
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly LogsBuffer _logsBuffer = LogsBuffer.Instance;
+
+        public ZebrunnerNLogTarget()
+        {
+            Logger.Debug($"{DateTime.UtcNow} Creating instance of NLog Target.");
+        }
 
         protected override void Write(LogEventInfo logEvent)
         {

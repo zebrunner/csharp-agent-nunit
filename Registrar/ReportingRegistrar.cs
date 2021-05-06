@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -36,6 +35,7 @@ namespace ZafiraIntegration.Registrar
         private ReportingRegistrar()
         {
             Target.Register<ZebrunnerNLogTarget>("Zebrunner");
+            Logger.Debug("Custom Zebrunner NLog target was registered successfully");
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -121,8 +121,8 @@ namespace ZafiraIntegration.Registrar
 
                 var jobUrl = (Environment.GetEnvironmentVariable("ci_url") ?? DefaultJobUrl).TrimEnd('/');
                 var jobNumber = Environment.GetEnvironmentVariable("ci_build");
-                Artifact.AttachReferenceToTest("Demo", $"{jobUrl}/${jobNumber}/Screenshots/${testName}/report.html");
-                Artifact.AttachReferenceToTest("Log", $"{jobUrl}/${jobNumber}/Logs/${testName}/test.log");
+                Artifact.AttachReferenceToTest("Demo", $"{jobUrl}/{jobNumber}/Screenshots/{testName}/report.html");
+                Artifact.AttachReferenceToTest("Log", $"{jobUrl}/{jobNumber}/Logs/{testName}/test.log");
 
                 Logger.Debug($"{DateTime.UtcNow} [{Thread.CurrentThread.Name}] ({testRun.Id}, {saveTestResponse.Id}) Test start was registered successfuly.");
             }

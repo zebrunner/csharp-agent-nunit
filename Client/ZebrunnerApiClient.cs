@@ -108,7 +108,7 @@ namespace ZafiraIntegration.Client
             var request = new RestRequest(Reporting($"/v1/test-runs/{testRunId}/logs"), DataFormat.Json);
             request.AddJsonBody(requestBody);
 
-            var response = _restClient.Put<SaveTestResponse>(request);
+            var response = _restClient.Post<SaveTestResponse>(request);
             if (response.StatusCode != HttpStatusCode.Accepted)
             {
                 Logger.Error($"Could not send test logs. Response body: {response.Content}");

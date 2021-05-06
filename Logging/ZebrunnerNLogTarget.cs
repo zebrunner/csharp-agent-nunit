@@ -14,11 +14,6 @@ namespace ZafiraIntegration.Logging
 
         private readonly LogsBuffer _logsBuffer = LogsBuffer.Instance;
 
-        public ZebrunnerNLogTarget()
-        {
-            Logger.Debug($"{DateTime.UtcNow} Creating instance of NLog Target.");
-        }
-
         protected override void Write(LogEventInfo logEvent)
         {
             var currentTest = RunContext.GetCurrentTest();

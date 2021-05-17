@@ -2,9 +2,9 @@
 
 namespace ZafiraIntegration.Registrar
 {
-    internal static class TestRunRegistrarFactory
+    public static class TestRunRegistrarFactory
     {
-        internal static ITestRunRegistrar GetTestRunRegistrar()
+        public static ITestRunRegistrar GetTestRunRegistrar()
         {
             return Configuration.IsReportingEnabled()
                 ? ReportingRegistrar.Instance

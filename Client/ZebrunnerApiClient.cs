@@ -208,5 +208,33 @@ namespace ZafiraIntegration.Client
                 Logger.Error($"Could not attach test labels. Response body: {response.Content}");
             }
         }
+
+        public SaveTestSessionResponse RegisterTestSessionStart(long testRunId, StartTestSessionRequest requestBody)
+        {
+            var request = new RestRequest(Reporting($"/v1/test-runs/{testRunId}/test-sessions"), DataFormat.Json);
+            request.AddJsonBody(requestBody);
+
+            var response = _restClient.Post<SaveTestSessionResponse>(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            throw new Exception($"Could not register start of test session. Response body is {response.Content}");
+        }
+
+        public SaveTestSessionResponse RegisterTestSessionUpdate(long testRunId, long testSessionId, UpdateTestSessionRequest requestBody)
+        {
+            var request = new RestRequest(Reporting($"/v1/test-runs/{testRunId}/test-sessions/{testSessionId}"), DataFormat.Json);
+            request.AddJsonBody(requestBody);
+
+            var response = _restClient.Post<SaveTestSessionResponse>(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            throw new Exception($"Could not register update of test session. Response body is {response.Content}");
+        }
     }
 }

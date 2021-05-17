@@ -86,8 +86,11 @@
     <Compile Include="Client\Requests\Label.cs" />
     <Compile Include="Client\Requests\Log.cs" />
     <Compile Include="Client\Requests\RefreshAccessTokenRequest.cs" />
+    <Compile Include="Client\Requests\StartTestSessionRequest.cs" />
+    <Compile Include="Client\Requests\UpdateTestSessionRequest.cs" />
     <Compile Include="Client\Requests\StartTestRequest.cs" />
     <Compile Include="Client\Requests\StartTestRunRequest.cs" />
+    <Compile Include="Client\Responses\SaveTestSessionResponse.cs" />
     <Compile Include="Client\Responses\RefreshAccessTokenResponse.cs" />
     <Compile Include="Client\Responses\SaveTestRunResponse.cs" />
     <Compile Include="Client\Responses\SaveTestResponse.cs" />
@@ -100,15 +103,20 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="attributes\ZafiraAssemblyTest.cs" />
     <Compile Include="Registrar\Artifact.cs" />
+    <Compile Include="Registrar\ITestRunRegistrar.cs" />
+    <Compile Include="Registrar\ITestSessionRegistrar.cs" />
     <Compile Include="Registrar\Label.cs" />
     <Compile Include="Registrar\LabelsResolver.cs" />
     <Compile Include="Registrar\MaintainerResolver.cs" />
     <Compile Include="Registrar\NoOpTestRunRegistrar.cs" />
+    <Compile Include="Registrar\NoOpTestSessionRegistrar.cs" />
     <Compile Include="Registrar\RunContext.cs" />
     <Compile Include="Registrar\ReportingRegistrar.cs" />
     <Compile Include="Registrar\Screenshot.cs" />
-    <Compile Include="Registrar\TestRunRegistrar.cs" />
+    <Compile Include="Registrar\SessionRegistrar.cs" />
     <Compile Include="Registrar\TestRunRegistrarFactory.cs" />
+    <Compile Include="Registrar\TestSessionRegistrarFactory.cs" />
+    <Compile Include="Registrar\TestSessionStart.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

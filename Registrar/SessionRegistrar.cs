@@ -36,7 +36,9 @@ namespace ZafiraIntegration.Registrar
                 var startTestSessionRequest = new StartTestSessionRequest
                 {
                     SessionId = sessionId,
-                    StartedAt = testSessionStart.StartedAt,
+                    InitiatedAt = testSessionStart.StartedAt.ToUniversalTime(),
+                    StartedAt = testSessionStart.StartedAt.ToUniversalTime(),
+                    Status = "RUNNING",
                     DesiredCapabilities = testSessionStart.DesiredCapabilities,
                     Capabilities = testSessionStart.Capabilities
                 };
@@ -59,7 +61,7 @@ namespace ZafiraIntegration.Registrar
             }
         }
 
-        public void RegisterTestSessionUpdate(string sessionId, DateTime endedAt)
+        public void RegisterTestSessionFinish(string sessionId, DateTime endedAt)
         {
             var testRun = RunContext.GetCurrentTestRun();
             var testSession = _sessionIdToSession[sessionId];
@@ -68,7 +70,7 @@ namespace ZafiraIntegration.Registrar
                 Log($"({testRun.Id}, {testSession.Id}) Registering test session update...");
                 var request = new UpdateTestSessionRequest
                 {
-                    EndedAt = endedAt
+                    EndedAt = endedAt.ToUniversalTime()
                 };
                 _apiClient.RegisterTestSessionUpdate(testRun.Id, testSession.Id, request);
 

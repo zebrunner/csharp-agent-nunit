@@ -7,7 +7,7 @@ namespace ZafiraIntegration.Registrar
     {
         void RegisterTestSessionStart(string sessionId, TestSessionStart testSessionStart);
 
-        void RegisterTestSessionUpdate(string sessionId, DateTime endedAt);
+        void RegisterTestSessionFinish(string sessionId, DateTime endedAt);
 
         void LinkAllCurrentToTest(long zebrunnerTestId);
 

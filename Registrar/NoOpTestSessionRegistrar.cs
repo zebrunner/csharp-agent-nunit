@@ -15,7 +15,7 @@ namespace ZafiraIntegration.Registrar
         {
         }
 
-        public void RegisterTestSessionUpdate(string sessionId, DateTime endedAt)
+        public void RegisterTestSessionFinish(string sessionId, DateTime endedAt)
         {
         }
 

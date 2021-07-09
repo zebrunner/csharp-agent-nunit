@@ -228,7 +228,7 @@ namespace ZafiraIntegration.Client
             var request = new RestRequest(Reporting($"/v1/test-runs/{testRunId}/test-sessions/{testSessionId}"), DataFormat.Json);
             request.AddJsonBody(requestBody);
 
-            var response = _restClient.Post<SaveTestSessionResponse>(request);
+            var response = _restClient.Put<SaveTestSessionResponse>(request);
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 return response.Data;

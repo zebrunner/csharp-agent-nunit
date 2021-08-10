@@ -1,8 +1,12 @@
-# Zafira::NUnit
+# Zebrunner NUnit agent
+
+> **Incubation warning**
+> 
+> Please note, that agent is currently in an **incubating state**, meaning that Zebrunner team can not guarantee its stable work since it was not properly tested.
 
 ZafiraIntegration library that implements integration Zafira reporting into existing NUnit test structure.
 
-## Usage
+## Inclusion into your project
 
 ### Installation
 
@@ -26,7 +30,7 @@ There are two possible ways to use library:
 [ZafiraAssembly] - for creation test suite in zafira with the name of Jenkins job it was triggered from
 [ZafiraAssemblyTest] - for creation tests in zafira
 ```
-### Examples
+## Examples
 
 - Use attributes for base testing class or just for classes that need to be reported:
 ```csharp

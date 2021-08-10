@@ -26,7 +26,7 @@ The following environment variables are recognized by the agent:
 - `REPORTING_RUN_ENVIRONMENT` - optional value. It is the environment where the tests will run. The value does not influence the actual tests execution and used only to display in Zebrunner;
 - `REPORTING_RUN_BUILD` - optional value. It is the build number that is associated with the test run. It can depict either the test build number or the application build number. The value does not influence the actual tests execution and used only to display in Zebrunner;
 
-### Configuration
+### Attributes
 
 There are two possible ways to use the agent:
 

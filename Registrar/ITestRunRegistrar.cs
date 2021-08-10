@@ -3,7 +3,7 @@ using NUnit.Framework.Interfaces;
 
 namespace ZafiraIntegration.Registrar
 {
-    internal interface ITestRunRegistrar
+    public interface ITestRunRegistrar
     {
         void RegisterTestRunStart(AttributeTargets attributeTarget);
 

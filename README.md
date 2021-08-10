@@ -31,20 +31,20 @@ The following environment variables are recognized by the agent:
 There are two possible ways to use the agent:
 
 1. Add class attributes for class level reporting:
-```
+```csharp
 [ZebrunnerClass] - for creation of a test run in Zebrunner with the name of the class
 [ZebrunnerTest] - for reporting test results in Zebrunner
 ```
 
 2. Add assembly and class attributes for assembly level reporting:
-```
+```csharp
 [ZebrunnerAssembly] - for creation of a test run in Zebrunner with the name of Jenkins job it was triggered from
 [ZebrunnerAssemblyTest] - for creation tests in Zebrunner
 ```
 
 #### Examples
 
-- Use attributes for base testing class or just for classes that need to be reported:
+Use attributes for base testing class or just for classes that need to be reported:
 ```csharp
     [TestFixture, ZebrunnerClass, ZebrunnerTest]
     public class BaseTest 
@@ -59,7 +59,7 @@ There are two possible ways to use the agent:
     }
 ```
 
-- Add assembly attribute for base testing class at assembly level and add test attribute for base testing class or just for classes that need to be reported
+Add assembly attribute for base testing class at assembly level and add test attribute for base testing class or just for classes that need to be reported
 ```csharp
 [assembly: ZebrunnerAssembly]
 

@@ -1,25 +1,24 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-using System;
+using ZafiraIntegration.Registrar;
 
 namespace ZafiraIntegration
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class ZafiraClass : Attribute, ITestAction
     {
-        private ZafiraListener zafiraListener;
-
-        public ActionTargets Targets { get; } = ActionTargets.Suite;
+        private static readonly ITestRunRegistrar TestRunRegistrar = TestRunRegistrarFactory.GetTestRunRegistrar();
+        public ActionTargets Targets => ActionTargets.Suite;
 
         public void BeforeTest(ITest test)
         {
-            zafiraListener = ZafiraTest.zafiraListener;
-            zafiraListener.OnStart(AttributeTargets.Class);
+            TestRunRegistrar.RegisterTestRunStart(AttributeTargets.Class);
         }
 
         public void AfterTest(ITest test)
         {
-            zafiraListener.OnFinish();
+            TestRunRegistrar.RegisterTestRunFinish();
         }
     }
 }

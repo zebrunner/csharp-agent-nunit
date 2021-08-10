@@ -1,7 +1,6 @@
 ﻿using System;
-using ZafiraIntegration.Client.Requests;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     public interface ITestSessionRegistrar
     {

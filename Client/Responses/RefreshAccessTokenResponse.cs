@@ -1,4 +1,4 @@
-﻿namespace ZafiraIntegration.Client.Responses
+﻿namespace ZebrunnerAgent.Client.Responses
 {
     internal class RefreshAccessTokenResponse
     {

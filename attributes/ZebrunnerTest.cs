@@ -1,24 +1,25 @@
 ﻿using System;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-using ZafiraIntegration.Registrar;
+using ZebrunnerAgent.Registrar;
 
-namespace ZafiraIntegration
+namespace ZebrunnerAgent.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class ZafiraClass : Attribute, ITestAction
+    public class ZebrunnerTest : Attribute, ITestAction
     {
         private static readonly ITestRunRegistrar TestRunRegistrar = TestRunRegistrarFactory.GetTestRunRegistrar();
-        public ActionTargets Targets => ActionTargets.Suite;
+        public ActionTargets Targets => ActionTargets.Test;
 
         public void BeforeTest(ITest test)
         {
             TestRunRegistrar.RegisterTestRunStart(AttributeTargets.Class);
+            TestRunRegistrar.RegisterTestStart(test);
         }
 
         public void AfterTest(ITest test)
         {
-            TestRunRegistrar.RegisterTestRunFinish();
+            TestRunRegistrar.RegisterTestFinish();
         }
     }
 }

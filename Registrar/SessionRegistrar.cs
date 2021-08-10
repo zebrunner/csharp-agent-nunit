@@ -3,11 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using NLog;
-using ZafiraIntegration.Client;
-using ZafiraIntegration.Client.Requests;
-using ZafiraIntegration.Client.Responses;
+using ZebrunnerAgent.Client;
+using ZebrunnerAgent.Client.Requests;
+using ZebrunnerAgent.Client.Responses;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     internal class SessionRegistrar : ITestSessionRegistrar
     {

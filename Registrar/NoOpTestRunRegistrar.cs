@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework.Interfaces;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     internal class NoOpTestRunRegistrar : ITestRunRegistrar
     {

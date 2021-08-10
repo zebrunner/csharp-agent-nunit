@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZafiraIntegration.Client.Responses
+namespace ZebrunnerAgent.Client.Responses
 {
     internal class SaveTestResponse
     {

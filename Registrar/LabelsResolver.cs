@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using NLog;
 using NUnit.Framework.Interfaces;
+using ZebrunnerAgent.Attributes;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     internal static class LabelsResolver
     {

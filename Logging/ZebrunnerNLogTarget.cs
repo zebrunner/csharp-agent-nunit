@@ -1,11 +1,10 @@
 ﻿using System;
 using NLog;
-using NLog.Layouts;
 using NLog.Targets;
-using ZafiraIntegration.Client.Requests;
-using ZafiraIntegration.Registrar;
+using ZebrunnerAgent.Client.Requests;
+using ZebrunnerAgent.Registrar;
 
-namespace ZafiraIntegration.Logging
+namespace ZebrunnerAgent.Logging
 {
     [Target("Zebrunner")]
     public class ZebrunnerNLogTarget : TargetWithLayout

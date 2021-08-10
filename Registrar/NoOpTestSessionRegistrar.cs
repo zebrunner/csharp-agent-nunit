@@ -1,7 +1,6 @@
 ﻿using System;
-using ZafiraIntegration.Client.Requests;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     internal class NoOpTestSessionRegistrar : ITestSessionRegistrar
     {

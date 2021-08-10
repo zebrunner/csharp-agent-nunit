@@ -8,11 +8,11 @@ using NLog;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
-using ZafiraIntegration.Client.Requests;
-using ZafiraIntegration.Client.Responses;
-using ZafiraIntegration.Config;
+using ZebrunnerAgent.Client.Requests;
+using ZebrunnerAgent.Client.Responses;
+using ZebrunnerAgent.Config;
 
-namespace ZafiraIntegration.Client
+namespace ZebrunnerAgent.Client
 {
     internal class ZebrunnerApiClient
     {

@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using NLog;
-using ZafiraIntegration.Client;
+using ZebrunnerAgent.Client;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     public static class Label
     {

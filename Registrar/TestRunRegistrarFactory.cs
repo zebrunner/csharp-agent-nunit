@@ -1,6 +1,6 @@
-﻿using ZafiraIntegration.Config;
+﻿using ZebrunnerAgent.Config;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     public static class TestRunRegistrarFactory
     {

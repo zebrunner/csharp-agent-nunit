@@ -1,4 +1,4 @@
-﻿namespace ZafiraIntegration.Config
+﻿namespace ZebrunnerAgent.Config
 {
     internal interface IConfigurationProvider
     {

@@ -1,7 +1,7 @@
 ﻿using System;
-using ZafiraIntegration.Client.Responses;
+using ZebrunnerAgent.Client.Responses;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     internal static class RunContext
     {

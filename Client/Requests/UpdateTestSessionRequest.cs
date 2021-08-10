@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ZafiraIntegration.Client.Requests
+namespace ZebrunnerAgent.Client.Requests
 {
     internal class UpdateTestSessionRequest
     {

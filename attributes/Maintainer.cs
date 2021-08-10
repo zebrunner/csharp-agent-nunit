@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZafiraIntegration
+namespace ZebrunnerAgent.attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class Maintainer : Attribute

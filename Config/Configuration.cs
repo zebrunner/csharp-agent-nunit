@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ZafiraIntegration.Config.Provider;
+using ZebrunnerAgent.Config.Provider;
 
-namespace ZafiraIntegration.Config
+namespace ZebrunnerAgent.Config
 {
     internal static class Configuration
     {

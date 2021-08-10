@@ -1,4 +1,4 @@
-﻿namespace ZafiraIntegration.Client.Requests
+﻿namespace ZebrunnerAgent.Client.Requests
 {
     internal class Label
     {

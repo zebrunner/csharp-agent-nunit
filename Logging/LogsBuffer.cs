@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NLog;
-using ZafiraIntegration.Client;
-using ZafiraIntegration.Client.Requests;
-using ZafiraIntegration.Registrar;
+using ZebrunnerAgent.Client;
+using ZebrunnerAgent.Client.Requests;
+using ZebrunnerAgent.Registrar;
 
-namespace ZafiraIntegration.Logging
+namespace ZebrunnerAgent.Logging
 {
     internal class LogsBuffer
     {

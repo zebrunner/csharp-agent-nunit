@@ -8,8 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProjectGuid>{140C6BE2-A67A-4CF9-8817-448FA12B6024}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ZafiraIntegration</RootNamespace>
-    <AssemblyName>ZafiraIntegration</AssemblyName>
+    <RootNamespace>ZebrunnerAgent</RootNamespace>
+    <AssemblyName>ZebrunnerAgent</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -75,11 +75,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="attributes\Maintainer.cs" />
-    <Compile Include="attributes\TestLabel.cs" />
-    <Compile Include="attributes\ZafiraClass.cs" />
-    <Compile Include="attributes\ZafiraAssembly.cs" />
-    <Compile Include="attributes\ZafiraTest.cs" />
+    <Compile Include="Attributes\Maintainer.cs" />
+    <Compile Include="Attributes\TestLabel.cs" />
+    <Compile Include="Attributes\ZebrunnerAssembly.cs" />
+    <Compile Include="Attributes\ZebrunnerAssemblyTest.cs" />
+    <Compile Include="Attributes\ZebrunnerClass.cs" />
+    <Compile Include="Attributes\ZebrunnerTest.cs" />
     <Compile Include="Client\Requests\ArtifactReference.cs" />
     <Compile Include="Client\Requests\FinishTestRequest.cs" />
     <Compile Include="Client\Requests\FinishTestRunRequest.cs" />
@@ -101,7 +102,6 @@
     <Compile Include="Logging\LogsBuffer.cs" />
     <Compile Include="Logging\ZebrunnerNLogTarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="attributes\ZafiraAssemblyTest.cs" />
     <Compile Include="Registrar\Artifact.cs" />
     <Compile Include="Registrar\ITestRunRegistrar.cs" />
     <Compile Include="Registrar\ITestSessionRegistrar.cs" />

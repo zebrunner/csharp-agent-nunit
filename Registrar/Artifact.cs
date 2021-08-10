@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using NLog;
-using ZafiraIntegration.Client;
-using ZafiraIntegration.Client.Requests;
+using ZebrunnerAgent.Client;
+using ZebrunnerAgent.Client.Requests;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     public static class Artifact
     {

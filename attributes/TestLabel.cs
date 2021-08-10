@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZafiraIntegration
+namespace ZebrunnerAgent.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class TestLabel : Attribute

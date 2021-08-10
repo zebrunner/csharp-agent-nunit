@@ -7,12 +7,12 @@ using NLog;
 using NLog.Targets;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-using ZafiraIntegration.Client;
-using ZafiraIntegration.Client.Requests;
-using ZafiraIntegration.Config;
-using ZafiraIntegration.Logging;
+using ZebrunnerAgent.Client;
+using ZebrunnerAgent.Client.Requests;
+using ZebrunnerAgent.Config;
+using ZebrunnerAgent.Logging;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     internal class ReportingRegistrar : ITestRunRegistrar
     {

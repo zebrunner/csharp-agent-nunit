@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using System.Reflection;
 using NUnit.Framework.Interfaces;
+using ZebrunnerAgent.attributes;
 
-namespace ZafiraIntegration.Registrar
+namespace ZebrunnerAgent.Registrar
 {
     internal static class MaintainerResolver
     {

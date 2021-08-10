@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ZafiraIntegration.Client.Responses
+namespace ZebrunnerAgent.Client.Responses
 {
     public class SaveTestSessionResponse
     {

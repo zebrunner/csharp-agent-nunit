@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZafiraIntegration", "ZafiraIntegration.csproj", "{140C6BE2-A67A-4CF9-8817-448FA12B6024}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZebrunnerAgent", "ZebrunnerAgent.csproj", "{140C6BE2-A67A-4CF9-8817-448FA12B6024}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

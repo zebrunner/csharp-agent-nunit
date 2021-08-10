@@ -11,7 +11,7 @@ namespace ZebrunnerAgent.Config.Provider
         private const string EnvironmentEnvironmentVariable = "REPORTING_RUN_ENVIRONMENT";
         private const string BuildEnvironmentVariable = "REPORTING_RUN_BUILD";
 
-        private const string DefaultProjectKey = "UNKNOWN";
+        private const string DefaultProjectKey = "DEF";
 
         public bool IsReportingEnabled()
         {

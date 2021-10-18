@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Reflection;
 using NUnit.Framework.Interfaces;
-using ZebrunnerAgent.attributes;
+using ZebrunnerAgent.Attributes;
 
 namespace ZebrunnerAgent.Registrar
 {

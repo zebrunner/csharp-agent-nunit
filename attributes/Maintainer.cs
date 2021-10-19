@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZebrunnerAgent.attributes
+namespace ZebrunnerAgent.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class Maintainer : Attribute

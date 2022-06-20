@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using NLog;
 using ZebrunnerAgent.Client;
 using ZebrunnerAgent.Client.Requests;
 using ZebrunnerAgent.Registrar;
@@ -12,7 +11,6 @@ namespace ZebrunnerAgent.Logging
 {
     internal class LogsBuffer
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         internal static LogsBuffer Instance { get; } = new LogsBuffer();
 
         private volatile ConcurrentQueue<Log> _buffer = new ConcurrentQueue<Log>();
@@ -23,15 +21,20 @@ namespace ZebrunnerAgent.Logging
         {
             Task.Run(() =>
             {
-                Logger.Info("Starting a recurring logs flushing task");
-                while (!_cancellationTokenSource.IsCancellationRequested)
+                while (true)
                 {
-                    Flush();
-                    Task.Delay(TimeSpan.FromSeconds(1), _cancellationTokenSource.Token);
+                    if (!_cancellationTokenSource.IsCancellationRequested)
+                    {
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
+                        Flush();
+                    }
+                    else
+                    {
+                        Flush();
+                        return;
+                    }
                 }
-
-                Logger.Info("Logs flushing task finished");
-            });
+            }, _cancellationTokenSource.Token);
         }
 
         internal void Add(Log log)
@@ -57,9 +60,7 @@ namespace ZebrunnerAgent.Logging
 
         ~LogsBuffer()
         {
-            Logger.Info("Finalizing logs buffer...");
             _cancellationTokenSource.Cancel();
-            Flush();
         }
     }
 }

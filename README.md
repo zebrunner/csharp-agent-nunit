@@ -6,6 +6,12 @@
 
 The Zebrunner NUnit agent provides reporting functionality and allows analyzing tests execution results from Zebrunner.
 
+Feel free to support the development with a [**donation**](https://www.paypal.com/donate/?hosted_button_id=MNHYYCYHAKUVA) for the next improvements.
+
+<p align="center">
+  <a href="https://zebrunner.com/"><img alt="Zebrunner" src="https://github.com/zebrunner/zebrunner/raw/master/docs/img/zebrunner_intro.png"></a>
+</p>
+
 ## Inclusion into your project
 
 The agent have not been published into NuGet since it is in incubating state. To include the agent into your project you have the following options:
